@@ -1,4 +1,5 @@
 import React from 'react';
+import { CONTENT } from '@/lib/dictionary';
 
 interface HeroProps {
     title: string;
@@ -7,7 +8,9 @@ interface HeroProps {
     ctaLink?: string;
 }
 
-export const Hero: React.FC<HeroProps> = ({ title, subtitle, ctaText = "Get in touch", ctaLink = "#" }) => {
+
+
+export const Hero: React.FC<HeroProps> = ({ title, subtitle, ctaText = CONTENT.hero.ctaDefault, ctaLink = "#" }) => {
     return (
         <section className="w-full py-32 md:py-48 flex flex-col items-center justify-center text-center px-4 max-w-5xl mx-auto">
             <h1 className="text-5xl md:text-7xl font-bold text-slate-900 mb-8 tracking-tight leading-tight">

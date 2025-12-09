@@ -1,4 +1,5 @@
 import React from 'react';
+import { CONTENT } from '@/lib/dictionary';
 
 interface Project {
     title: string;
@@ -12,7 +13,9 @@ interface CaseStudiesProps {
     projects: Project[];
 }
 
-export const CaseStudies: React.FC<CaseStudiesProps> = ({ title = "Featured Work", projects }) => {
+
+
+export const CaseStudies: React.FC<CaseStudiesProps> = ({ title = CONTENT.caseStudies.sectionTitle, projects }) => {
     return (
         <section className="w-full py-32 px-4 max-w-4xl mx-auto">
             {title && (
@@ -32,7 +35,7 @@ export const CaseStudies: React.FC<CaseStudiesProps> = ({ title = "Featured Work
                                     href={project.link}
                                     className="text-sm font-semibold text-accent-pink hover:text-rose-700 underline underline-offset-4"
                                 >
-                                    View Solution
+                                    {CONTENT.caseStudies.viewSolution}
                                 </a>
                             )}
                         </h3>
