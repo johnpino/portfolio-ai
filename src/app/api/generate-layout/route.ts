@@ -1,11 +1,72 @@
 import { NextResponse } from 'next/server';
 import { LayoutConfig } from '@/types/layout';
+import { Skill } from '@/types/skills';
 
 export async function POST(_request: Request) {
-    // In a real scenario, we would parse the body for persona/intent
-    // const body = await request.json(); 
-
     // Simulated AI response
+    const skillsData: Skill[] = [
+        {
+            id: 'ts-1',
+            name: 'TypeScript',
+            role: 'Core Skill',
+            level: 'Expert',
+            since: '2019',
+            lastUsed: 'Currently using',
+            tags: ['Safety', 'Generics', 'Tooling'],
+            evidence: 'Migrated a 50k+ LOC vanilla JS codebase to TypeScript strict mode, reducing runtime errors by 40%.'
+        },
+        {
+            id: 'react-1',
+            name: 'React',
+            role: 'Core Skill',
+            level: 'Expert',
+            since: '2018',
+            lastUsed: 'Currently using',
+            tags: ['Hooks', 'Context', 'Performance'],
+            evidence: 'Architected a complex dashboard with virtualized lists and real-time WebSocket updates.'
+        },
+        {
+            id: 'next-1',
+            name: 'Next.js',
+            role: 'Core Skill',
+            level: 'Advanced',
+            since: '2020',
+            lastUsed: 'Currently using',
+            tags: ['SSR', 'App Router', 'RSC'],
+            evidence: 'Implemented a multi-tenant platform using Middleware and ISR for sub-second page loads.'
+        },
+        {
+            id: 'tailwind-1',
+            name: 'TailwindCSS',
+            role: 'Supporting Skill',
+            level: 'Expert',
+            since: '2020',
+            lastUsed: 'Currently using',
+            tags: ['Design Systems', 'Responsive'],
+            evidence: 'Built a custom design system plugin to standardize spacing and colors across 5 internal apps.'
+        },
+        {
+            id: 'node-1',
+            name: 'Node.js',
+            role: 'Supporting Skill',
+            level: 'Advanced',
+            since: '2019',
+            lastUsed: 'Used last month',
+            tags: ['API', 'Microservices'],
+            evidence: 'Developed a scalable image processing worker service handling 10k daily uploads.'
+        },
+        {
+            id: 'ai-1',
+            name: 'Generative AI',
+            role: 'Complementary Skill',
+            level: 'Comfortable',
+            since: '2023',
+            lastUsed: 'Currently using',
+            tags: ['RAG', 'Prompt Engineering'],
+            evidence: 'Integrated OpenAI function calling to create an intelligent customer support chatbot.'
+        }
+    ];
+
     const mockLayout: LayoutConfig = {
         layout: [
             {
@@ -22,16 +83,8 @@ export async function POST(_request: Request) {
                 id: 'block_2',
                 type: 'skills-grid',
                 props: {
-                    title: 'Technical Arsenal',
-                    skills: [
-                        { name: 'TypeScript', category: 'Language' },
-                        { name: 'React', category: 'Frontend' },
-                        { name: 'Next.js', category: 'Framework' },
-                        { name: 'TailwindCSS', category: 'Style' },
-                        { name: 'Node.js', category: 'Backend' },
-                        { name: 'Python', category: 'Language' },
-                        { name: 'OpenAI API', category: 'AI' }
-                    ]
+                    title: 'Capabilities & Evidence',
+                    skills: skillsData,
                 }
             },
             {
