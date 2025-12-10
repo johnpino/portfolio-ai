@@ -108,6 +108,50 @@ export async function POST(_request: Request) {
                     ]
                 }
             },
+            // WAVE 1 VERIFICATION BLOCKS
+            {
+                id: 'w1_headline',
+                type: 'headline',
+                props: {
+                    text: "Engineering High-Scale Systems for Fintech Leaders.",
+                    size: '2xl',
+                    align: 'center'
+                }
+            },
+            {
+                id: 'w1_metrics',
+                type: 'system-metrics',
+                props: {
+                    metrics: [
+                        { label: 'Uptime', value: '99.99%', trend: '+0.09%', trendDirection: 'up' },
+                        { label: 'Latency', value: '45ms', trend: '-20%', trendDirection: 'up' },
+                        { label: 'Users', value: '50k+', trend: 'Steady', trendDirection: 'neutral' },
+                        { label: 'Revenue', value: '$2M', trend: 'ARR', trendDirection: 'neutral' }
+                    ]
+                }
+            },
+            {
+                id: 'w1_headline_2',
+                type: 'headline',
+                props: {
+                    text: "Experience at a Glance",
+                    size: 'xl',
+                    align: 'left'
+                }
+            },
+            {
+                id: 'w1_resume',
+                type: 'quick-resume',
+                props: {
+                    summary: "Senior Full Stack Engineer with 6+ years of specialized experience in React, Node.js, and Cloud Infrastructure. Proven track record of leading teams and shipping production-critical software.",
+                    education: "BS Computer Science, Tech University (2018)",
+                    experience: [
+                        { role: "Senior Engineer", company: "Fintech Corp", years: "2022 - Present", location: "New York" },
+                        { role: "Software Engineer", company: "Startup Inc", years: "2019 - 2022", location: "Remote" },
+                        { role: "Junior Developer", company: "Agency LLC", years: "2018 - 2019", location: "London" }
+                    ]
+                }
+            },
             // WAVE 2 VERIFICATION BLOCKS
             {
                 id: 'w2_code',
