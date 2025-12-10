@@ -1,4 +1,5 @@
 import React from 'react';
+import { CONTENT } from '@/lib/dictionary';
 
 interface ProblemSolutionProps {
     problem: string;
@@ -13,7 +14,7 @@ export const ProblemSolution: React.FC<ProblemSolutionProps> = ({ problem, solut
                 {/* The Problem (Left) */}
                 <div className="relative p-8 rounded-2xl bg-rose-50/50 border border-rose-100">
                     <div className="absolute -top-3 left-8 bg-white px-2 py-0.5 rounded border border-rose-100 uppercase tracking-widest text-[10px] font-bold text-rose-500">
-                        The Problem
+                        {CONTENT.arsenal.problemSolution.problemLabel}
                     </div>
                     <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-4 leading-tight">
                         "We were losing customers due to slow load times."
@@ -29,7 +30,7 @@ export const ProblemSolution: React.FC<ProblemSolutionProps> = ({ problem, solut
                 {/* The Solution (Right) */}
                 <div className="relative p-8 rounded-2xl bg-emerald-50/50 border border-emerald-100 shadow-sm md:mt-12">
                     <div className="absolute -top-3 left-8 bg-white px-2 py-0.5 rounded border border-emerald-100 uppercase tracking-widest text-[10px] font-bold text-emerald-600">
-                        The Solution
+                        {CONTENT.arsenal.problemSolution.solutionLabel}
                     </div>
                     <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-4 leading-tight">
                         "I architected a new caching layer."

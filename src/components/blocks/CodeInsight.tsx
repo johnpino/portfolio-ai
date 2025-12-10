@@ -1,4 +1,5 @@
 import React from 'react';
+import { CONTENT } from '@/lib/dictionary';
 
 interface CodeInsightProps {
     title: string;
@@ -37,7 +38,7 @@ export const CodeInsight: React.FC<CodeInsightProps> = ({ title, code, caption }
             {/* Caption */}
             {caption && (
                 <p className="mt-6 text-center text-slate-500 text-sm font-medium italic">
-                    Config: {caption}
+                    {CONTENT.arsenal.codeInsight.configLabel} {caption}
                 </p>
             )}
         </section>

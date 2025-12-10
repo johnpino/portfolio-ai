@@ -1,4 +1,5 @@
 import React from 'react';
+import { CONTENT } from '@/lib/dictionary';
 
 interface TimelineItem {
     year: string;
@@ -28,7 +29,7 @@ export const CareerTimeline: React.FC<CareerTimelineProps> = ({ items }) => {
                         {/* Content */}
                         <h3 className="text-xl font-bold text-slate-900">
                             {item.title}
-                            <span className="font-normal text-slate-500"> at {item.company}</span>
+                            <span className="font-normal text-slate-500"> {CONTENT.arsenal.careerTimeline.at} {item.company}</span>
                         </h3>
 
                         <p className="mt-2 text-slate-600 leading-relaxed max-w-xl">

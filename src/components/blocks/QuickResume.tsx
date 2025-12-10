@@ -1,4 +1,5 @@
 import React from 'react';
+import { CONTENT } from '@/lib/dictionary';
 
 interface ExperienceItem {
     role: string;
@@ -19,7 +20,7 @@ export const QuickResume: React.FC<QuickResumeProps> = ({ summary, experience, e
             <div className="bg-white border border-slate-200 rounded-lg p-8 shadow-sm">
                 {/* Header */}
                 <div className="border-b border-slate-100 pb-6 mb-8">
-                    <h3 className="text-xs uppercase tracking-widest font-bold text-slate-400 mb-4">Professional Summary</h3>
+                    <h3 className="text-xs uppercase tracking-widest font-bold text-slate-400 mb-4">{CONTENT.arsenal.quickResume.summaryTitle}</h3>
                     <p className="text-slate-700 leading-relaxed font-medium">
                         {summary}
                     </p>
@@ -27,7 +28,7 @@ export const QuickResume: React.FC<QuickResumeProps> = ({ summary, experience, e
 
                 {/* Experience List */}
                 <div>
-                    <h3 className="text-xs uppercase tracking-widest font-bold text-slate-400 mb-6">Work History</h3>
+                    <h3 className="text-xs uppercase tracking-widest font-bold text-slate-400 mb-6">{CONTENT.arsenal.quickResume.historyTitle}</h3>
                     <div className="space-y-6">
                         {experience.map((job, idx) => (
                             <div key={idx} className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
@@ -47,7 +48,7 @@ export const QuickResume: React.FC<QuickResumeProps> = ({ summary, experience, e
                 {/* Education Footer */}
                 {education && (
                     <div className="mt-8 pt-8 border-t border-slate-100">
-                        <h3 className="text-xs uppercase tracking-widest font-bold text-slate-400 mb-2">Education</h3>
+                        <h3 className="text-xs uppercase tracking-widest font-bold text-slate-400 mb-2">{CONTENT.arsenal.quickResume.educationTitle}</h3>
                         <p className="text-slate-900 font-medium">{education}</p>
                     </div>
                 )}

@@ -65,4 +65,21 @@ export const CONTENT = {
         impactTitle: "The Impact",
         techStackTitle: "Technologies Used",
     },
+    arsenal: {
+        quickResume: {
+            summaryTitle: "Professional Summary",
+            historyTitle: "Work History",
+            educationTitle: "Education",
+        },
+        problemSolution: {
+            problemLabel: "The Problem",
+            solutionLabel: "The Solution",
+        },
+        codeInsight: {
+            configLabel: "Config:",
+        },
+        careerTimeline: {
+            at: "at",
+        },
+    },
 };
