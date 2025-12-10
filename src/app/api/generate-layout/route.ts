@@ -97,14 +97,14 @@ export async function POST(_request: Request) {
                             title: 'Dynamic Portfolio Generator',
                             description: 'An AI-driven portfolio site that reconstructs its own layout based on JSON configuration. Built with Next.js and TypeScript.',
                             tags: ['Next.js', 'React', 'Generative UI'],
-                            link: '#'
+                            link: '/projects/dynamic-portfolio-generator'
                         },
                         {
                             title: 'E-commerce Microservices',
                             description: 'A scalable e-commerce backend built with NestJS and RabbitMQ, handling 10k+ concurrent users.',
                             tags: ['NestJS', 'Microservices', 'Docker'],
-                            link: '#'
-                        }
+                            link: '/projects/ecommerce-microservices'
+                        },
                     ]
                 }
             }

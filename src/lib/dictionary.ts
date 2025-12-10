@@ -58,4 +58,11 @@ export const CONTENT = {
         viewProjectWithArrow: "View Project →",
         viewSolution: "View Solution",
     },
+    projectDetail: {
+        backToPortfolio: "← Back to Portfolio",
+        challengeTitle: "The Challenge",
+        solutionTitle: "The Solution (Added Value)",
+        impactTitle: "The Impact",
+        techStackTitle: "Technologies Used",
+    },
 };
