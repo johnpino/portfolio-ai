@@ -203,7 +203,7 @@ export async function POST(_request: Request) {
                 type: 'tech-ecosystem',
                 props: {
                     centralNode: 'React Architecture',
-                    connectedNodes: ['Next.js', 'TypeScript', 'Tailwind', 'GraphQL']
+                    connectedNodes: ['Next.js', 'TypeScript', 'Tailwind', 'GraphQL', 'Next.js', 'TypeScript', 'Tailwind', 'GraphQL']
                 }
             },
             {
