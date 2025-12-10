@@ -107,6 +107,71 @@ export async function POST(_request: Request) {
                         },
                     ]
                 }
+            },
+            // WAVE 2 VERIFICATION BLOCKS
+            {
+                id: 'w2_code',
+                type: 'code-insight',
+                props: {
+                    title: 'lib/cache-strategy.ts',
+                    code: `export async function getCachedData(key: string) {
+  const cached = await redis.get(key);
+  if (cached) return JSON.parse(cached);
+
+  const data = await db.query(...);
+  await redis.set(key, JSON.stringify(data), 'EX', 3600);
+  return data;
+}`,
+                    caption: 'Implements the "Stale-While-Revalidate" pattern for optimal performance.'
+                }
+            },
+            {
+                id: 'w2_probsol',
+                type: 'problem-solution',
+                props: {
+                    problem: "The legacy API was taking 2000ms to respond, causing a 40% drop-off rate at checkout.",
+                    solution: "I implemented a tiered caching strategy with Redis and optimized the SQL queries, reducing P99 latency to 45ms."
+                }
+            },
+            {
+                id: 'w2_testimonial',
+                type: 'testimonial',
+                props: {
+                    quote: "John is the rare engineer who cares as much about the business impact as he does about the code quality. A true asset.",
+                    author: "Sarah Jenkins",
+                    role: "CTO",
+                    company: "Fintech Corp"
+                }
+            },
+            // WAVE 3 VERIFICATION BLOCKS
+            {
+                id: 'w3_timeline',
+                type: 'career-timeline',
+                props: {
+                    items: [
+                        { year: '2025', title: 'Lead Engineer', company: 'Fintech Corp', description: 'Architecting next-gen payments infrastructure.' },
+                        { year: '2023', title: 'Senior Developer', company: 'Startup.io', description: 'Scaled userbase from 10k to 1M.' }
+                    ]
+                }
+            },
+            {
+                id: 'w3_eco',
+                type: 'tech-ecosystem',
+                props: {
+                    centralNode: 'React Architecture',
+                    connectedNodes: ['Next.js', 'TypeScript', 'Tailwind', 'GraphQL']
+                }
+            },
+            {
+                id: 'w3_gallery',
+                type: 'gallery',
+                props: {
+                    images: [
+                        { src: '', alt: 'Dashboard UI', caption: 'Real-time Analytics' },
+                        { src: '', alt: 'Mobile App', caption: 'iOS Interface' },
+                        { src: '', alt: 'Design System', caption: 'Component Library' }
+                    ]
+                }
             }
         ]
     };

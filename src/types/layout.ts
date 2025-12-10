@@ -1,4 +1,16 @@
-export type BlockType = 'hero' | 'skills-grid' | 'case-studies-list';
+export type BlockType =
+    | 'hero'
+    | 'skills-grid'
+    | 'case-studies-list'
+    | 'headline'
+    | 'system-metrics'
+    | 'quick-resume'
+    | 'code-insight'
+    | 'problem-solution'
+    | 'testimonial'
+    | 'career-timeline'
+    | 'tech-ecosystem'
+    | 'gallery';
 
 export interface LayoutBlock {
     id: string;
