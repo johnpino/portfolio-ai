@@ -10,7 +10,7 @@ interface SkillsGridProps {
 
 
 
-export const SkillsGrid: React.FC<SkillsGridProps> = ({ title = CONTENT.skills.sectionTitle, skills }) => {
+export const SkillsGrid: React.FC<SkillsGridProps> = ({ title = CONTENT.skills.sectionTitle, skills = [] }) => {
     // Guard against mismatching data types during transition or generic errors
     const richSkills = skills.filter(s => typeof s !== 'string') as Skill[];
 
