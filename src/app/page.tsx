@@ -13,7 +13,7 @@ export default function Home() {
 
   // Initial Load
   useEffect(() => {
-    generateLayout('initial demo');
+    generateLayout('Create a comprehensive professional portfolio highlighting my full-stack development skills, key projects, and career timeline.');
   }, []);
 
   const generateLayout = async (prompt: string) => {
