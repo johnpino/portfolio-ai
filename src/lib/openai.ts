@@ -20,14 +20,11 @@ export async function generateEmbedding(text: string) {
 const BLOCK_DEFINITIONS = `
 - hero: { title, subtitle, ctaText, ctaLink }
 - headline: { text, size: 'xl' | '2xl', align: 'left' | 'center' }
-- system-metrics: { metrics: [{ label, value, trend?, trendDirection? }] }
 - quick-resume: { summary, experience: [{ role, company, years, location? }], education? }
-- skills-grid: { title, skills: [] } (Note: Skills mock data usually handled by frontend, but if you have specific skills in context, list them in a "skills" array in the props if needed, though for now the component handles data. Actually, the mock API in route.ts populated this. The AI should just output the BLOCK structure. For skills-grid, it might be safer to let the frontend populate it or have the AI invent the skills data based on context. Let's ask the AI to generate the skills data based on the profile context.)
-- code-insight: { title, code, language?, caption? }
+- skills-grid: { title, skills: [{ name, role: 'Core Skill' | 'Supporting Skill' | 'Complementary Skill', level: 'Expert' | 'Advanced' | 'Comfortable', evidence?, tags?, since?, lastUsed? }] }
 - problem-solution: { problemTitle, problem, solutionTitle, solution }
 - testimonial: { quote, author, role, company?, avatar? }
 - career-timeline: { items: [{ year, title, company, description }] }
-- tech-ecosystem: { centralNode, connectedNodes: string[] }
 - case-studies-list: { title, projects: [{ title, description, tags, link }] }
 - gallery: { images: [{ src, alt, caption? }] }
 `;

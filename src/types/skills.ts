@@ -6,8 +6,8 @@ export interface Skill {
     name: string;
     role: SkillRole;
     level: SkillLevel;
-    since: string;    // e.g. "2019"
-    lastUsed: string; // e.g. "Currently using"
-    tags: string[];   // e.g. ["Architecture", "SSR"]
-    evidence: string; // Short credible proof point
+    since?: string;    // e.g. "2019"
+    lastUsed?: string; // e.g. "Currently using"
+    tags?: string[];   // e.g. ["Architecture", "SSR"]
+    evidence?: string; // Short credible proof point
 }

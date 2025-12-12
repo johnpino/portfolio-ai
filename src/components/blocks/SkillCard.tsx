@@ -75,30 +75,43 @@ export const SkillCard: React.FC<SkillCardProps> = ({ skill }) => {
                     </div>
                 </div>
 
-                <div className="w-px h-3 bg-slate-300" />
-                <div>{CONTENT.skills.labels.since} {skill.since}</div>
-                <div className="w-px h-3 bg-slate-300" />
-                <div className={skill.lastUsed.includes('Curr') ? 'text-emerald-600' : ''}>{skill.lastUsed}</div>
+                {skill.since && (
+                    <>
+                        <div className="w-px h-3 bg-slate-300" />
+                        <div>{CONTENT.skills.labels.since} {skill.since}</div>
+                    </>
+                )}
+
+                {skill.lastUsed && (
+                    <>
+                        <div className="w-px h-3 bg-slate-300" />
+                        <div className={skill.lastUsed.includes('Curr') ? 'text-emerald-600' : ''}>{skill.lastUsed}</div>
+                    </>
+                )}
             </div>
 
             {/* Evidence */}
-            <div className="mb-6 flex-grow">
-                <p className="text-sm text-slate-700 leading-relaxed font-medium">
-                    “{skill.evidence}”
-                </p>
-            </div>
+            {skill.evidence && (
+                <div className="mb-6 flex-grow">
+                    <p className="text-sm text-slate-700 leading-relaxed font-medium">
+                        “{skill.evidence}”
+                    </p>
+                </div>
+            )}
 
             {/* Tags */}
-            <div className="flex flex-wrap gap-2 mt-auto pt-4 md:pt-0">
-                {skill.tags.map((tag) => (
-                    <span
-                        key={tag}
-                        className="px-2 py-1 text-[10px] font-semibold text-slate-500 bg-slate-50 rounded border border-slate-100"
-                    >
-                        {tag}
-                    </span>
-                ))}
-            </div>
+            {skill.tags && skill.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-auto pt-4 md:pt-0">
+                    {skill.tags.map((tag) => (
+                        <span
+                            key={tag}
+                            className="px-2 py-1 text-[10px] font-semibold text-slate-500 bg-slate-50 rounded border border-slate-100"
+                        >
+                            {tag}
+                        </span>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
