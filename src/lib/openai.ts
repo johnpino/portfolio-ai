@@ -24,7 +24,7 @@ const BLOCK_DEFINITIONS = `
 - quick-resume: { summary, experience: [{ role, company, years, location? }], education? }
 - skills-grid: { title, skills: [] } (Note: Skills mock data usually handled by frontend, but if you have specific skills in context, list them in a "skills" array in the props if needed, though for now the component handles data. Actually, the mock API in route.ts populated this. The AI should just output the BLOCK structure. For skills-grid, it might be safer to let the frontend populate it or have the AI invent the skills data based on context. Let's ask the AI to generate the skills data based on the profile context.)
 - code-insight: { title, code, language?, caption? }
-- problem-solution: { problem, solution }
+- problem-solution: { problemTitle, problem, solutionTitle, solution }
 - testimonial: { quote, author, role, company?, avatar? }
 - career-timeline: { items: [{ year, title, company, description }] }
 - tech-ecosystem: { centralNode, connectedNodes: string[] }

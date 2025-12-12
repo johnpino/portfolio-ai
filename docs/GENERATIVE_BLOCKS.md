@@ -100,8 +100,10 @@ interface CodeInsightProps {
 A split-screen layout contrasting a problem with a solution.
 ```typescript
 interface ProblemSolutionProps {
-  problem: string; // The "Before" state (Warning style)
-  solution: string; // The "After" state (Success style)
+  problemTitle: string; // The "Hook" quote
+  problem: string; // The detailed problem description
+  solutionTitle: string; // The "Hero" quote
+  solution: string; // The detailed solution description
 }
 ```
 

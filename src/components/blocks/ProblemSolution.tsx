@@ -2,11 +2,18 @@ import React from 'react';
 import { CONTENT } from '@/lib/dictionary';
 
 interface ProblemSolutionProps {
+    problemTitle: string;
     problem: string;
+    solutionTitle: string;
     solution: string;
 }
 
-export const ProblemSolution: React.FC<ProblemSolutionProps> = ({ problem, solution }) => {
+export const ProblemSolution: React.FC<ProblemSolutionProps> = ({
+    problemTitle = "The Problem",
+    problem,
+    solutionTitle = "The Solution",
+    solution
+}) => {
     return (
         <section className="w-full py-24 px-4 max-w-6xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-start">
@@ -17,7 +24,7 @@ export const ProblemSolution: React.FC<ProblemSolutionProps> = ({ problem, solut
                         {CONTENT.arsenal.problemSolution.problemLabel}
                     </div>
                     <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-4 leading-tight">
-                        "We were losing customers due to slow load times."
+                        "{problemTitle}"
                     </h3>
                     <p className="text-slate-600 leading-relaxed">
                         {problem}
@@ -33,7 +40,7 @@ export const ProblemSolution: React.FC<ProblemSolutionProps> = ({ problem, solut
                         {CONTENT.arsenal.problemSolution.solutionLabel}
                     </div>
                     <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-4 leading-tight">
-                        "I architected a new caching layer."
+                        "{solutionTitle}"
                     </h3>
                     <p className="text-slate-700 font-medium leading-relaxed">
                         {solution}
