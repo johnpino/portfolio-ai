@@ -3,16 +3,16 @@ import { LayoutConfig } from '@/types/layout';
 
 const apiKey = process.env.OPENAI_API_KEY || "dummy-key-for-build";
 const openai = new OpenAI({
-    apiKey: apiKey,
+  apiKey: apiKey,
 });
 
 // 1. Generate Embedding for RAG
 export async function generateEmbedding(text: string) {
-    const response = await openai.embeddings.create({
-        model: 'text-embedding-3-large',
-        input: text.replace(/\n/g, ' '),
-    });
-    return response.data[0].embedding;
+  const response = await openai.embeddings.create({
+    model: 'text-embedding-3-large',
+    input: text.replace(/\n/g, ' '),
+  });
+  return response.data[0].embedding;
 }
 
 // 2. System Prompt Context
@@ -34,7 +34,7 @@ const BLOCK_DEFINITIONS = `
 
 // 3. Generate Layout
 export async function generateLayoutWithContext(userPrompt: string, context: string[]): Promise<LayoutConfig> {
-    const systemPrompt = `
+  const systemPrompt = `
     You are an expert Portfolio Designer responsible for creating a personalized portfolio layout JSON.
     
     YOUR GOAL:
@@ -67,17 +67,17 @@ export async function generateLayoutWithContext(userPrompt: string, context: str
     7. Be strictly factual based on the provided context.
   `;
 
-    const response = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt },
-        ],
-        response_format: { type: 'json_object' },
-    });
+  const response = await openai.chat.completions.create({
+    model: 'gpt-5-mini',
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+    response_format: { type: 'json_object' },
+  });
 
-    const content = response.choices[0].message.content;
-    if (!content) throw new Error('No content generated');
+  const content = response.choices[0].message.content;
+  if (!content) throw new Error('No content generated');
 
-    return JSON.parse(content) as LayoutConfig;
+  return JSON.parse(content) as LayoutConfig;
 }

@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     }
 
     try {
-        const userQuery = prompt || "Show me a general portfolio";
+        const userQuery = prompt || "Create a comprehensive portfolio layout showcasing my entire professional background, including all my key skills, detailed experience, and major projects. Use a rich variety of blocks.";
 
         // 1. Retrieve IDs from Pinecone (Vector Search)
         // We need to check if queryProfileData returns IDs or text.
