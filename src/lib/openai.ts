@@ -47,13 +47,16 @@ export async function generateLayoutWithContext(userPrompt: string, context: str
 
   // Use Structured Outputs via Zod
   const response = await openai.responses.parse({
-    model: 'gpt-4o-2024-08-06', // Ensuring model supports Structured Outputs
+    model: 'gpt-5-nano', // Ensuring model supports Structured Outputs
     input: [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: finalPrompt },
     ],
     text: {
       format: zodTextFormat(PortfolioLayoutSchema, "portfolio_layout"),
+    },
+    reasoning: {
+      effort: "low"
     },
   });
 
