@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: portfolio-ai
+    env: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    autoDeployTrigger: commit
+    region: oregon
+    repo: https://github.com/johnpino/portfolio-ai
+    domains:
+      - www.johnpino.me
+      - johnpino.me
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: PINECONE_API_KEY
+        sync: false
+      - key: PINECONE_INDEX_NAME
+        sync: false
+      - key: CONTENTFUL_SPACE_ID
+        sync: false
+      - key: CONTENTFUL_ACCESS_TOKEN
+        sync: false
+      - key: CONTENTFUL_ENVIRONMENT
+        sync: false
+      - key: CONTENTFUL_WEBHOOK_SECRET
+        sync: false
+      - key: NODE_VERSION
+        value: 20.11.0
