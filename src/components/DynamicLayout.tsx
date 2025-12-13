@@ -16,7 +16,6 @@ import { Gallery } from './blocks/Gallery';
 // Map string types to actual React components
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const BLOCK_COMPONENTS: Record<BlockType, React.FC<any>> = {
-    'hero': Hero,
     'skills-grid': SkillsGrid,
     'case-studies-list': CaseStudies,
     'headline': Headline,

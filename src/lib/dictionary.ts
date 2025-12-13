@@ -8,7 +8,10 @@ export const CONTENT = {
         empty: "No layout configuration provided.",
     },
     hero: {
-        ctaDefault: "Get in touch",
+        title: "John Pino",
+        subtitle: "Frontend Technical Lead & AI-Native Architect.\nBuilding scalable, composable web ecosystems and redefining engineering workflows with Artificial Intelligence.",
+        cta: "View Professional Experience",
+        ctaLink: "#quick-resume",
     },
     skills: {
         sectionTitle: "Technical Arsenal",

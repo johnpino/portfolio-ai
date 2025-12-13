@@ -30,6 +30,7 @@ const SYSTEM_PROMPT = `
     2. CRITICAL: If "NO CONTEXT FOUND" or the provided context does NOT support the user's specific request (e.g. they ask for "Cobol" and you have no Cobol context), DO NOT INVENT SKILLS OR PROJECTS.
     3. Instead, return a layout that explicitly states you have no experience in that area. Use a 'headline' block saying something like "I don't have specific commercial experience with [Topic]." and then show your actual 'quick-resume' or General Skills to be helpful.
     4. Be strictly factual based on the provided context.
+    5. User has a static HERO section. DO NOT generate a 'hero' block. Focus on the content below the fold.
 `;
 
 // 3. Generate Layout

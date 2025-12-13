@@ -1,5 +1,4 @@
 export type BlockType =
-    | 'hero'
     | 'skills-grid'
     | 'case-studies-list'
     | 'headline'

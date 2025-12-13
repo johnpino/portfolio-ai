@@ -165,7 +165,6 @@ export const TechEcosystemBlockSchema = BaseBlockSchema.extend({
 
 // Discriminated Union of All Blocks (using z.union for OpenAI compatibility)
 export const LayoutBlockTypeSchema = z.union([
-    HeroBlockSchema,
     HeadlineBlockSchema,
     QuickResumeBlockSchema,
     SkillsGridBlockSchema,
