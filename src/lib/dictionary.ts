@@ -6,6 +6,7 @@ export const CONTENT = {
         loading: "Generating layout...",
         error: "Failed to load content.",
         empty: "No layout configuration provided.",
+        downloadCV: "Download Resume",
     },
     hero: {
         title: "John Pino",

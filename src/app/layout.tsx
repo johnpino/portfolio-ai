@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 
 import { LayoutProvider } from "@/context/LayoutContext";
 import { ScrollToTop } from '@/components/ScrollToTop';
+import { CVDownloadButton } from '@/components/CVDownloadButton';
 
 // ... existing imports
 
@@ -39,6 +40,7 @@ export default function RootLayout({
           <Hero />
           {children}
           <ScrollToTop />
+          <CVDownloadButton />
         </LayoutProvider>
         <Footer />
       </body>
