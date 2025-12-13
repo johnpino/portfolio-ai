@@ -21,7 +21,7 @@ export const LayoutProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     useEffect(() => {
         // We only trigger the initial generation if no layout exists yet
         if (!layout) {
-            generateLayout('Create a comprehensive professional portfolio highlighting my frontend development skills, key projects, career timeline, etc. Be as specific as possible.');
+            generateLayout('Create a comprehensive professional portfolio showcasing my profile as a Lead. The layout MUST follow this specific order of blocks: 1. A very detailed "quick-resume" block. 2. A "skills-grid" block. 3. A "career-timeline" block. 4. "case-studies-list" blocks. 5. Any complementary blocks that enhance my profile as a Lead (e.g., testimonials, philosophy, etc.). Ensure the QuickResume is prominent and detailed.');
         }
     }, []);
 
