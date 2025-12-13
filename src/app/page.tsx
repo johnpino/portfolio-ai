@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { DynamicLayout } from '@/components/DynamicLayout';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
 import { useLayoutContext } from '@/context/LayoutContext';
@@ -31,9 +32,14 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen pb-32">
-      <div ref={contentRef}>
+      <motion.div
+        ref={contentRef}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
         <DynamicLayout layout={layout} />
-      </div>
+      </motion.div>
     </main>
   );
 }
