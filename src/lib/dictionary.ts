@@ -9,7 +9,8 @@ export const CONTENT = {
     },
     hero: {
         title: "John Pino",
-        subtitle: "Frontend Technical Lead & AI-Native Architect.\nBuilding scalable, composable web ecosystems and redefining engineering workflows with Artificial Intelligence.",
+        role: "Frontend Technical Lead",
+        subtitle: "Building scalable, composable web ecosystems and redefining engineering workflows with Artificial Intelligence.",
         cta: "",
         ctaLink: "",
         scrollHint: "Scroll down, AI is generating your personalized content...",

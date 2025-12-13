@@ -3,6 +3,7 @@ import { CONTENT } from '@/lib/dictionary';
 
 interface HeroProps {
     title?: string;
+    role?: string;
     subtitle?: string;
     ctaText?: string;
     ctaLink?: string;
@@ -12,6 +13,7 @@ interface HeroProps {
 
 export const Hero: React.FC<Partial<HeroProps>> = ({
     title = CONTENT.hero.title,
+    role = CONTENT.hero.role,
     subtitle = CONTENT.hero.subtitle,
     ctaText = CONTENT.hero.cta,
     ctaLink = CONTENT.hero.ctaLink
@@ -19,9 +21,13 @@ export const Hero: React.FC<Partial<HeroProps>> = ({
     return (
         <section className="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-4 max-w-5xl mx-auto">
             <div className="flex-1 flex flex-col items-center justify-center">
-                <h1 className="text-6xl md:text-8xl font-light mb-8 tracking-tight leading-tight bg-clip-text text-transparent bg-linear-to-r from-slate-900 to-slate-600">
+                <h1 className="text-6xl md:text-8xl font-light tracking-tight leading-tight bg-clip-text text-transparent bg-linear-to-r from-slate-900 to-slate-600">
                     {title}
                 </h1>
+
+                <p className="text-xl md:text-2xl font-medium text-slate-700 mb-8 tracking-wide">
+                    {role}
+                </p>
 
                 <div className="w-24 h-1.5 bg-accent-pink mb-10 rounded-full" />
 
