@@ -42,54 +42,62 @@ export async function POST(req: NextRequest) {
         const eventType = headers['x-contentful-topic'];
         const pineconeIndex = getPinecone().index(INDEX_NAME);
 
-        // 2. Handle Events
-        if (eventType === 'ContentManagement.Entry.publish') {
-            console.log(`Processing Publish: ${body.sys.id}`);
+        // 2. Handle Events (or direct simplified calls)
+        // Check for simplified payload structure first or flexible extraction
+        const entryId = body.sys?.id || body.id;
 
-            // Extract content to embed. 
-            // User's webhook example used `body.content`, but Contentful payloads usually have `fields`.
-            // We will safeguard this. If fields exist, map them to a string.
-            // Or assume the user has a specific 'content' field?
-            // "body.content" in the user example implies a flattened payload or specific field.
-            // Let's inspect fields.
+        if (!entryId) {
+            return NextResponse.json({ message: 'Missing entry ID' }, { status: 400 });
+        }
 
-            // Robust extraction:
-            const fields = body.fields || {};
-            // Join all localizable text fields (assuming 'en-US' or picking the first locale key)
-            // For simplicity, let's JSON stringify the fields or look for 'description'/'body'.
-            const contentToEmbed = fields.content?.['en-US'] || fields.description?.['en-US'] || fields.body?.['en-US'] || JSON.stringify(fields);
+        // Determine event type equivalent if not provided in headers (fallback for manual tests)
+        // If we received a body with ID and content, treat it as a publish/update.
+        const effectiveEventType = eventType || 'ContentManagement.Entry.publish';
+
+        if (effectiveEventType === 'ContentManagement.Entry.publish' || !eventType) {
+            console.log(`Processing Publish: ${entryId}`);
+
+            // Content Extraction Strategy
+            let contentToEmbed = '';
+
+            if (body.content && typeof body.content === 'string') {
+                // Simplified, direct content field
+                contentToEmbed = body.content;
+            } else if (body.fields) {
+                // Standard Contentful payload
+                const fields = body.fields;
+                contentToEmbed = fields.content?.['en-US'] || fields.description?.['en-US'] || fields.body?.['en-US'] || JSON.stringify(fields);
+            }
 
             if (!contentToEmbed) {
-                console.warn("No content to embed for", body.sys.id);
+                console.warn("No content to embed for", entryId);
                 return NextResponse.json({ message: "No content found" });
             }
 
-            console.log("Generating embedding for:", body.sys.id);
+            console.log("Generating embedding for:", entryId);
             const openAI = getOpenAI();
             const embedding = await openAI.embeddings.create({
                 model: 'text-embedding-3-large',
                 input: contentToEmbed,
             });
 
+            const contentTypeId = body.sys?.contentType?.sys?.id || 'manual-entry';
+
             await pineconeIndex.upsert([
                 {
-                    id: body.sys.id, // Contentful Entry ID
+                    id: entryId,
                     values: embedding.data[0].embedding,
                     metadata: {
-                        // We DON'T store the full text here anymore, per the new plan? 
-                        // Actually, the plan said "Refactor route.ts for Pinecone -> Contentful lookup".
-                        // So we only need the ID in Pinecone.
-                        // But adding some debug metadata is helpful.
-                        contentType: body.sys.contentType.sys.id,
+                        contentType: contentTypeId,
                     }
                 },
             ]);
             console.log("Upserted to Pinecone");
         }
 
-        if (eventType === 'ContentManagement.Entry.delete') {
-            console.log(`Processing Delete: ${body.sys.id}`);
-            await pineconeIndex.deleteOne(body.sys.id);
+        if (effectiveEventType === 'ContentManagement.Entry.delete') {
+            console.log(`Processing Delete: ${entryId}`);
+            await pineconeIndex.deleteOne(entryId);
             console.log("Deleted from Pinecone");
         }
 
