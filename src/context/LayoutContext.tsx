@@ -21,7 +21,7 @@ export const LayoutProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     useEffect(() => {
         // We only trigger the initial generation if no layout exists yet
         if (!layout) {
-            generateLayout('Create a comprehensive professional portfolio highlighting my full-stack development skills, key projects, and career timeline.');
+            generateLayout('Create a comprehensive professional portfolio highlighting my frontend development skills, key projects, career timeline, etc. Be as specific as possible.');
         }
     }, []);
 

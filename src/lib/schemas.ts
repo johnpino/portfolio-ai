@@ -173,9 +173,9 @@ export const LayoutBlockTypeSchema = z.union([
     CareerTimelineBlockSchema,
     CaseStudiesListBlockSchema,
     GalleryBlockSchema,
-    SystemMetricsBlockSchema,
-    CodeInsightBlockSchema,
-    TechEcosystemBlockSchema,
+    //SystemMetricsBlockSchema,
+    //CodeInsightBlockSchema,
+    //TechEcosystemBlockSchema,
 ]);
 
 // Main Layout Schema
