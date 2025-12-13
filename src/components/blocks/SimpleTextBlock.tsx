@@ -15,10 +15,10 @@ export const SimpleTextBlock: React.FC<SimpleTextBlockProps> = ({ title, content
                         {title}
                     </h2>
                     {style === 'accent' && (
-                        <div className="absolute -bottom-2 left-0 w-12 h-1 bg-indigo-500 rounded-full opacity-80" />
+                        <div className="absolute -bottom-2 left-0 w-12 h-1 bg-accent-pink rounded-full" />
                     )}
                     {style === 'bordered' && (
-                        <div className="absolute -left-4 top-1 bottom-1 w-1 bg-indigo-500 rounded-full opacity-60" />
+                        <div className="absolute -left-4 top-1 bottom-1 w-1 bg-accent-pink rounded-full" />
                     )}
                 </div>
 
