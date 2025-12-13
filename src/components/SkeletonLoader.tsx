@@ -5,12 +5,12 @@ import 'react-loading-skeleton/dist/skeleton.css';
 export const SkeletonLoader = () => {
     return (
         <SkeletonTheme baseColor="#f8fafc" highlightColor="#e2e8f0">
-            <div className="max-w-6xl mx-auto px-4 py-24 space-y-24">
+            <div className="max-w-6xl px-4 py-24 space-y-24">
 
                 {/* Hero Skeleton */}
-                <div className="flex flex-col items-center space-y-6">
-                    <Skeleton height={64} width={600} className="max-w-full" />
-                    <Skeleton height={28} width={400} className="max-w-[80%]" />
+                <div className="flex flex-col items-center space-y-6 w-full">
+                    <Skeleton height={64} className="w-full max-w-[600px]" />
+                    <Skeleton height={28} className="w-full max-w-[400px]" />
                     <div className="pt-6">
                         <Skeleton height={52} width={180} borderRadius={999} />
                     </div>
