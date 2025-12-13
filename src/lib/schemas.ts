@@ -47,6 +47,7 @@ export const QuickResumeBlockSchema = BaseBlockSchema.extend({
 
 // 4. Skills Grid
 export const SkillItemSchema = z.object({
+    id: z.string().describe("Unique identifier").nullable(),
     name: z.string(),
     role: z.enum(['Core Skill', 'Supporting Skill', 'Complementary Skill']),
     level: z.enum(['Expert', 'Advanced', 'Comfortable']),

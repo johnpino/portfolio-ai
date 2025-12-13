@@ -12,7 +12,12 @@ interface SkillsGridProps {
 
 export const SkillsGrid: React.FC<SkillsGridProps> = ({ title = CONTENT.skills.sectionTitle, skills = [] }) => {
     // Guard against mismatching data types during transition or generic errors
-    const richSkills = skills.filter(s => typeof s !== 'string') as Skill[];
+    const richSkills = skills
+        .filter(s => typeof s !== 'string')
+        .map((s, i) => ({
+            ...s,
+            id: s.id || `skill-${i}-${s.name ? s.name.replace(/\s+/g, '-').toLowerCase() : 'unknown'}`
+        })) as Skill[];
 
     if (richSkills.length === 0) {
         return null;
