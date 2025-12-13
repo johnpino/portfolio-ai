@@ -10,8 +10,8 @@ export const CONTENT = {
     hero: {
         title: "John Pino",
         subtitle: "Frontend Technical Lead & AI-Native Architect.\nBuilding scalable, composable web ecosystems and redefining engineering workflows with Artificial Intelligence.",
-        cta: "View Professional Experience",
-        ctaLink: "#quick-resume",
+        cta: "",
+        ctaLink: "",
     },
     skills: {
         sectionTitle: "Technical Arsenal",

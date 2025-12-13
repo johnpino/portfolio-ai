@@ -19,13 +19,13 @@ export const Hero: React.FC<Partial<HeroProps>> = ({
     return (
         <section className="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-4 max-w-5xl mx-auto">
             <div className="flex-1 flex flex-col items-center justify-center">
-                <h1 className="text-6xl md:text-8xl font-black text-slate-900 mb-8 tracking-tighter leading-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">
+                <h1 className="text-6xl md:text-8xl font-light mb-8 tracking-tight leading-tight bg-clip-text text-transparent bg-linear-to-r from-slate-900 to-slate-600">
                     {title}
                 </h1>
 
                 <div className="w-24 h-1.5 bg-accent-pink mb-10 rounded-full" />
 
-                <p className="text-xl md:text-2xl text-slate-500 max-w-3xl mb-12 font-medium leading-relaxed">
+                <p className="text-xl md:text-xl text-slate-500 max-w-3xl mb-12 font-light leading-relaxed">
                     {subtitle}
                 </p>
 
