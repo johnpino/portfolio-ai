@@ -32,7 +32,7 @@ export default function Home() {
   }
 
   return (
-    <main className="relative min-h-screen">
+    <main className="relative">
       <motion.div
         ref={contentRef}
         initial={{ opacity: 0, y: -20 }}
