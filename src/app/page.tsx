@@ -1,42 +1,27 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { DynamicLayout } from '@/components/DynamicLayout';
-import { GenerativeInput } from '@/components/GenerativeInput';
-import { LayoutConfig } from '@/types/layout';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
+import { useLayoutContext } from '@/context/LayoutContext';
 
 export default function Home() {
-  const [layout, setLayout] = useState<LayoutConfig | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const { layout, loading, isGenerating } = useLayoutContext();
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  // Initial Load
+  // Auto-scroll when layout is populated and not initial loading
   useEffect(() => {
-    generateLayout('Create a comprehensive professional portfolio highlighting my full-stack development skills, key projects, and career timeline.');
-  }, []);
-
-  const generateLayout = async (prompt: string) => {
-    setIsGenerating(true);
-    // Only show full screen loader on initial load
-    if (!layout) setLoading(true);
-
-    try {
-      const res = await fetch('/api/generate-layout', {
-        method: 'POST',
-        body: JSON.stringify({ prompt }),
-      });
-      const data = await res.json();
-      setLayout(data);
-    } catch (error) {
-      console.error('Failed to load layout:', error);
-    } finally {
-      setLoading(false);
-      setIsGenerating(false);
+    if (layout && !loading && !isGenerating && contentRef.current) {
+      // Small timeout to ensure DOM render
+      setTimeout(() => {
+        contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     }
-  };
+  }, [layout, loading, isGenerating]);
 
-  if (loading) {
+  // If loading and NO layout, show full screen skeleton. 
+  // If we have a layout but are regenerating, we might want to just show the spinner in the input (handled by GlobalInput)
+  if (loading && !layout) {
     return <SkeletonLoader />;
   }
 
@@ -46,8 +31,9 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen pb-32">
-      <DynamicLayout layout={layout} />
-      <GenerativeInput onGenerate={generateLayout} isGenerating={isGenerating} />
+      <div ref={contentRef}>
+        <DynamicLayout layout={layout} />
+      </div>
     </main>
   );
 }
