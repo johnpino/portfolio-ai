@@ -1,12 +1,10 @@
 import React from 'react';
 import { CONTENT } from '@/lib/dictionary';
 
-interface ProblemSolutionProps {
-    problemTitle: string;
-    problem: string;
-    solutionTitle: string;
-    solution: string;
-}
+import { z } from 'zod';
+import { ProblemSolutionPropsSchema } from '@/lib/schemas';
+
+type ProblemSolutionProps = z.infer<typeof ProblemSolutionPropsSchema>;
 
 export const ProblemSolution: React.FC<ProblemSolutionProps> = ({
     problemTitle = "The Problem",

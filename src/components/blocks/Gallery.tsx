@@ -1,14 +1,9 @@
 import React from 'react';
 
-interface GalleryImage {
-    src: string;
-    alt: string;
-    caption?: string;
-}
+import { z } from 'zod';
+import { GalleryPropsSchema } from '@/lib/schemas';
 
-interface GalleryProps {
-    images: GalleryImage[];
-}
+type GalleryProps = z.infer<typeof GalleryPropsSchema>;
 
 export const Gallery: React.FC<GalleryProps> = ({ images }) => {
     return (

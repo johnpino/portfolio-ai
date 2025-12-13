@@ -34,9 +34,9 @@ const getLevelContent = (level: Skill['level']) => {
     }
 };
 
-interface SkillCardProps {
+type SkillCardProps = {
     skill: Skill;
-}
+};
 
 export const SkillCard: React.FC<SkillCardProps> = ({ skill }) => {
     const roleContent = getRoleContent(skill.role);
@@ -92,7 +92,7 @@ export const SkillCard: React.FC<SkillCardProps> = ({ skill }) => {
 
             {/* Evidence */}
             {skill.evidence && (
-                <div className="mb-6 flex-grow">
+                <div className="mb-6 grow">
                     <p className="text-sm text-slate-700 leading-relaxed font-medium">
                         “{skill.evidence}”
                     </p>

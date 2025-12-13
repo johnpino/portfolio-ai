@@ -1,12 +1,10 @@
 import React from 'react';
 import { CONTENT } from '@/lib/dictionary';
 
-interface CodeInsightProps {
-    title: string;
-    code: string;
-    language?: string; // 'typescript' | 'json' etc. (For future highlighting integration)
-    caption?: string;
-}
+import { z } from 'zod';
+import { CodeInsightBlockSchema } from '@/lib/schemas';
+
+type CodeInsightProps = z.infer<typeof CodeInsightBlockSchema>['props'];
 
 export const CodeInsight: React.FC<CodeInsightProps> = ({ title, code, caption }) => {
     return (

@@ -5,13 +5,10 @@ import { CONTENT } from '@/lib/dictionary';
 import { GenerativeInput } from '@/components/GenerativeInput';
 import { useLayoutContext } from '@/context/LayoutContext';
 
-interface HeroProps {
-    title?: string;
-    role?: string;
-    subtitle?: string;
-    ctaText?: string;
-    ctaLink?: string;
-}
+import { z } from 'zod';
+import { HeroPropsSchema } from '@/lib/schemas';
+
+type HeroProps = z.infer<typeof HeroPropsSchema>;
 
 export const Hero: React.FC<Partial<HeroProps>> = ({
     title = CONTENT.hero.title,
@@ -49,7 +46,7 @@ export const Hero: React.FC<Partial<HeroProps>> = ({
 
                 {ctaText && (
                     <a
-                        href={ctaLink}
+                        href={ctaLink || '#'}
                         className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-full bg-accent-pink hover:bg-rose-600 text-white shadow-lg shadow-rose-200 transition-all hover:scale-105 active:scale-95 group"
                         aria-label={ctaText}
                     >

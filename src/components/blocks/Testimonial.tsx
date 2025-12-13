@@ -1,12 +1,9 @@
 import React from 'react';
 
-interface TestimonialProps {
-    quote: string;
-    author: string;
-    role: string;
-    company?: string;
-    avatar?: string; // URL to image
-}
+import { z } from 'zod';
+import { TestimonialPropsSchema } from '@/lib/schemas';
+
+type TestimonialProps = z.infer<typeof TestimonialPropsSchema>;
 
 export const Testimonial: React.FC<TestimonialProps> = ({ quote, author, role, company }) => {
     return (

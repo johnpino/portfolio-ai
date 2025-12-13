@@ -1,9 +1,9 @@
 import React from 'react';
 
-interface TechStackEcosystemProps {
-    centralNode: string;
-    connectedNodes: string[];
-}
+import { z } from 'zod';
+import { TechEcosystemBlockSchema } from '@/lib/schemas';
+
+type TechStackEcosystemProps = z.infer<typeof TechEcosystemBlockSchema>['props'];
 
 export const TechStackEcosystem: React.FC<TechStackEcosystemProps> = ({ centralNode, connectedNodes }) => {
     return (
@@ -35,7 +35,7 @@ export const TechStackEcosystem: React.FC<TechStackEcosystemProps> = ({ centralN
             For true responsiveness without complex math, we'll use a hidden grid or hardcoded positions for specific indices 
         */}
                 <div className="absolute inset-0 pointer-events-none">
-                    {connectedNodes.map((node, idx) => {
+                    {connectedNodes && connectedNodes.map((node, idx) => {
                         // Hardcoded positions for up to 6 nodes to create an "Orbit" look
                         // This is a simplified way to achieve the look without heavy JS math
                         const positions = [

@@ -1,18 +1,10 @@
 import React from 'react';
 import { CONTENT } from '@/lib/dictionary';
 
-interface ExperienceItem {
-    role: string;
-    company: string;
-    years: string;
-    location?: string;
-}
+import { z } from 'zod';
+import { QuickResumePropsSchema } from '@/lib/schemas';
 
-interface QuickResumeProps {
-    summary: string;
-    experience: ExperienceItem[];
-    education?: string; // Simple one-liner for now
-}
+type QuickResumeProps = z.infer<typeof QuickResumePropsSchema>;
 
 export const QuickResume: React.FC<QuickResumeProps> = ({ summary, experience, education }) => {
     return (

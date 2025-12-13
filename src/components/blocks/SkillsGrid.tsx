@@ -3,10 +3,10 @@ import { Skill } from '@/types/skills';
 import { SkillCard } from './SkillCard';
 import { CONTENT } from '@/lib/dictionary';
 
-interface SkillsGridProps {
-    title?: string;
-    skills: Skill[] | any[]; // relaxed type to avoid breaking existing simple strings initially
-}
+import { z } from 'zod';
+import { SkillsGridPropsSchema } from '@/lib/schemas';
+
+type SkillsGridProps = z.infer<typeof SkillsGridPropsSchema>;
 
 
 

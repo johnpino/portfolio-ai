@@ -1,16 +1,10 @@
 import React from 'react';
 import { CONTENT } from '@/lib/dictionary';
 
-interface TimelineItem {
-    year: string;
-    title: string;
-    company: string;
-    description: string;
-}
+import { z } from 'zod';
+import { CareerTimelinePropsSchema } from '@/lib/schemas';
 
-interface CareerTimelineProps {
-    items: TimelineItem[];
-}
+type CareerTimelineProps = z.infer<typeof CareerTimelinePropsSchema>;
 
 export const CareerTimeline: React.FC<CareerTimelineProps> = ({ items }) => {
     return (

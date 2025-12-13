@@ -1,17 +1,10 @@
 import React from 'react';
 import { CONTENT } from '@/lib/dictionary';
 
-interface Project {
-    title: string;
-    description: string;
-    tags?: string[];
-    link?: string;
-}
+import { z } from 'zod';
+import { CaseStudiesListPropsSchema } from '@/lib/schemas';
 
-interface CaseStudiesProps {
-    title?: string;
-    projects: Project[];
-}
+type CaseStudiesProps = z.infer<typeof CaseStudiesListPropsSchema>;
 
 
 

@@ -1,21 +1,15 @@
 import React from 'react';
 
-interface Metric {
-    label: string;
-    value: string;
-    trend?: string;
-    trendDirection?: 'up' | 'down' | 'neutral';
-}
+import { z } from 'zod';
+import { SystemMetricsBlockSchema } from '@/lib/schemas';
 
-interface SystemMetricsProps {
-    metrics: Metric[];
-}
+type SystemMetricsProps = z.infer<typeof SystemMetricsBlockSchema>['props'];
 
 export const SystemMetrics: React.FC<SystemMetricsProps> = ({ metrics }) => {
     return (
         <section className="w-full px-4 max-w-3xl mx-auto text-left">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-                {metrics.map((metric, idx) => (
+                {metrics && metrics.map((metric, idx) => (
                     <div
                         key={idx}
                         className="p-6 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center text-center hover:border-accent-pink/30 transition-colors"

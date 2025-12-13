@@ -8,6 +8,7 @@ const BaseBlockSchema = z.object({
 // 1. Hero
 export const HeroPropsSchema = z.object({
     title: z.string(),
+    role: z.string().nullable().describe("e.g. 'Software Engineer'"),
     subtitle: z.string(),
     ctaText: z.string().nullable(),
     ctaLink: z.string().nullable(),
@@ -140,7 +141,12 @@ export const SystemMetricsBlockSchema = BaseBlockSchema.extend({
     type: z.literal('system-metrics'),
     props: z.object({
         title: z.string().nullable(),
-        metrics: z.array(z.object({ label: z.string(), value: z.string() })).nullable(),
+        metrics: z.array(z.object({
+            label: z.string(),
+            value: z.string(),
+            trend: z.string().nullable(),
+            trendDirection: z.enum(['up', 'down', 'neutral']).nullable()
+        })).nullable(),
     }),
 });
 
@@ -149,8 +155,9 @@ export const CodeInsightBlockSchema = BaseBlockSchema.extend({
     type: z.literal('code-insight'),
     props: z.object({
         title: z.string().nullable(),
-        codeSnippet: z.string().nullable(),
-        explanation: z.string().nullable(),
+        code: z.string().nullable(),
+        language: z.string().nullable(),
+        caption: z.string().nullable(),
     }),
 });
 
@@ -159,7 +166,8 @@ export const TechEcosystemBlockSchema = BaseBlockSchema.extend({
     type: z.literal('tech-ecosystem'),
     props: z.object({
         title: z.string().nullable(),
-        stack: z.array(z.string()).nullable(),
+        centralNode: z.string().nullable(),
+        connectedNodes: z.array(z.string()).nullable(),
     }),
 });
 

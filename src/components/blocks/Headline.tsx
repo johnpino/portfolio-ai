@@ -1,10 +1,9 @@
 import React from 'react';
 
-interface HeadlineProps {
-    text: string;
-    size?: 'xl' | '2xl'; // xl = 4xl/5xl (section header), 2xl = 6xl/7xl (main statement)
-    align?: 'left' | 'center';
-}
+import { z } from 'zod';
+import { HeadlinePropsSchema } from '@/lib/schemas';
+
+type HeadlineProps = z.infer<typeof HeadlinePropsSchema>;
 
 export const Headline: React.FC<HeadlineProps> = ({ text, size = 'xl', align = 'center' }) => {
     const sizeClasses = size === '2xl'

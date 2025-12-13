@@ -1,9 +1,9 @@
 import React from 'react';
 
-interface SimpleTextBlockProps {
-    title: string;
-    content: string;
-}
+import { z } from 'zod';
+import { SimpleTextBlockPropsSchema } from '@/lib/schemas';
+
+type SimpleTextBlockProps = z.infer<typeof SimpleTextBlockPropsSchema>;
 
 export const SimpleTextBlock: React.FC<SimpleTextBlockProps> = ({ title, content }) => {
     return (
