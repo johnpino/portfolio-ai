@@ -7,6 +7,7 @@ export const CONTENT = {
         error: "Failed to load content.",
         empty: "No layout configuration provided.",
         downloadCV: "Download Resume",
+        email: "iam@johnpino.me",
     },
     hero: {
         title: "John Pino",
