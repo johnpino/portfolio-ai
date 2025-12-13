@@ -15,8 +15,8 @@ export const CONTENT = {
         scrollHint: "Scroll down, AI is generating your personalized content...",
     },
     generative: {
-        placeholderDefault: "Describe the portfolio you want to see...",
-        placeholderGenerating: "Analyzing your profile and generating a unique layout...",
+        placeholderDefault: "Ask me anything about John's career...",
+        placeholderGenerating: "Generating personalized content...",
     },
     skills: {
         sectionTitle: "Technical Arsenal",
