@@ -44,10 +44,15 @@ export const Hero: React.FC<Partial<HeroProps>> = ({
             </div>
 
             {/* Scroll Hint */}
-            <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 animate-bounce">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8 text-slate-300">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                </svg>
+            <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2">
+                <span className="text-xs md:text-sm text-slate-400 whitespace-nowrap font-light tracking-wide opacity-80">
+                    {CONTENT.hero.scrollHint}
+                </span>
+                <div className="animate-bounce">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-slate-300">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    </svg>
+                </div>
             </div>
         </section>
     );

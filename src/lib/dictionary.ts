@@ -12,6 +12,11 @@ export const CONTENT = {
         subtitle: "Frontend Technical Lead & AI-Native Architect.\nBuilding scalable, composable web ecosystems and redefining engineering workflows with Artificial Intelligence.",
         cta: "",
         ctaLink: "",
+        scrollHint: "Scroll down, AI is generating your personalized content...",
+    },
+    generative: {
+        placeholderDefault: "Describe the portfolio you want to see...",
+        placeholderGenerating: "Analyzing your profile and generating a unique layout...",
     },
     skills: {
         sectionTitle: "Technical Arsenal",

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CONTENT } from '@/lib/dictionary';
 
 interface GenerativeInputProps {
     onGenerate: (prompt: string) => Promise<void>;
@@ -42,7 +43,7 @@ export const GenerativeInput: React.FC<GenerativeInputProps> = ({ onGenerate, is
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         disabled={isGenerating}
-                        placeholder="Describe the portfolio you want to see..."
+                        placeholder={isGenerating ? CONTENT.generative.placeholderGenerating : CONTENT.generative.placeholderDefault}
                         className="flex-1 bg-transparent border-none focus:ring-0 text-slate-800 placeholder:text-slate-400 text-sm md:text-base py-2"
                     />
 

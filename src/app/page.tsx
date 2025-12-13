@@ -15,7 +15,7 @@ export default function Home() {
       // Small timeout to ensure DOM render
       setTimeout(() => {
         contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
+      }, 500);
     }
   }, [layout, loading, isGenerating]);
 
