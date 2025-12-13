@@ -39,7 +39,7 @@ export const DynamicLayout: React.FC<DynamicLayoutProps> = ({ layout }) => {
     }
 
     return (
-        <main className="min-h-screen">
+        <main className="min-h-screen flex flex-col gap-24 md:gap-32 pb-24">
             {layout.layout.map((block) => {
                 const Component = BLOCK_COMPONENTS[block.type];
 

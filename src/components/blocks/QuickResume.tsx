@@ -16,7 +16,7 @@ interface QuickResumeProps {
 
 export const QuickResume: React.FC<QuickResumeProps> = ({ summary, experience, education }) => {
     return (
-        <section className="w-full py-16 px-4 max-w-3xl mx-auto">
+        <section className="w-full px-4 max-w-3xl mx-auto">
             <div className="bg-white border border-slate-200 rounded-lg p-8 shadow-sm">
                 {/* Header */}
                 <div className="border-b border-slate-100 pb-6 mb-8">
@@ -32,7 +32,7 @@ export const QuickResume: React.FC<QuickResumeProps> = ({ summary, experience, e
                     <div className="space-y-6">
                         {experience.map((job, idx) => (
                             <div key={idx} className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
-                                <div className="flex-grow">
+                                <div className="grow">
                                     <h4 className="font-bold text-slate-900">{job.role}</h4>
                                     <span className="text-slate-600 font-medium">{job.company}</span>
                                 </div>

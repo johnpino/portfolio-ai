@@ -12,10 +12,10 @@ interface GalleryProps {
 
 export const Gallery: React.FC<GalleryProps> = ({ images }) => {
     return (
-        <section className="w-full py-16 px-4 max-w-7xl mx-auto">
+        <section className="w-full px-4 max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {images.map((img, idx) => (
-                    <div key={idx} className="group relative overflow-hidden rounded-xl bg-slate-100 aspect-video md:aspect-[4/3]">
+                    <div key={idx} className="group relative overflow-hidden rounded-xl bg-slate-100 aspect-video md:aspect-4/3">
                         {/* 
                    In a real app, use Next.js <Image /> 
                    For now, we use a placeholder div that mimics an image
@@ -25,7 +25,7 @@ export const Gallery: React.FC<GalleryProps> = ({ images }) => {
                         </div>
 
                         {img.caption && (
-                            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="absolute bottom-0 left-0 right-0 p-4 bg-linear-to-t from-black/60 to-transparent text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                                 {img.caption}
                             </div>
                         )}

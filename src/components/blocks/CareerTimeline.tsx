@@ -14,7 +14,7 @@ interface CareerTimelineProps {
 
 export const CareerTimeline: React.FC<CareerTimelineProps> = ({ items }) => {
     return (
-        <section className="w-full py-24 px-4 max-w-3xl mx-auto">
+        <section className="w-full px-4 max-w-4xl mx-auto">
             <div className="relative border-l-2 border-slate-200 ml-4 md:ml-6 space-y-12">
                 {items.map((item, idx) => (
                     <div key={idx} className="relative pl-8 md:pl-12">

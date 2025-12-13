@@ -13,7 +13,7 @@ interface SystemMetricsProps {
 
 export const SystemMetrics: React.FC<SystemMetricsProps> = ({ metrics }) => {
     return (
-        <section className="w-full py-12 px-4 max-w-7xl mx-auto">
+        <section className="w-full px-4 max-w-3xl mx-auto text-left">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                 {metrics.map((metric, idx) => (
                     <div
@@ -28,8 +28,8 @@ export const SystemMetrics: React.FC<SystemMetricsProps> = ({ metrics }) => {
                         </span>
                         {metric.trend && (
                             <div className={`px-2 py-1 rounded text-xs font-bold ${metric.trendDirection === 'up' ? 'bg-emerald-100 text-emerald-700' :
-                                    metric.trendDirection === 'down' ? 'bg-rose-100 text-rose-700' :
-                                        'bg-slate-200 text-slate-600'
+                                metric.trendDirection === 'down' ? 'bg-rose-100 text-rose-700' :
+                                    'bg-slate-200 text-slate-600'
                                 }`}>
                                 {metric.trend}
                             </div>

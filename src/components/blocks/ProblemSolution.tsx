@@ -15,7 +15,7 @@ export const ProblemSolution: React.FC<ProblemSolutionProps> = ({
     solution
 }) => {
     return (
-        <section className="w-full py-24 px-4 max-w-6xl mx-auto">
+        <section className="w-full px-4 max-w-6xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-start">
 
                 {/* The Problem (Left) */}

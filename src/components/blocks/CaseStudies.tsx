@@ -17,7 +17,7 @@ interface CaseStudiesProps {
 
 export const CaseStudies: React.FC<CaseStudiesProps> = ({ title = CONTENT.caseStudies.sectionTitle, projects }) => {
     return (
-        <section className="w-full py-32 px-4 max-w-4xl mx-auto">
+        <section className="w-full px-4 max-w-4xl mx-auto">
             {title && (
                 <h2 className="text-3xl font-bold text-slate-800 mb-16 text-center">{title}</h2>
             )}

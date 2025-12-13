@@ -7,7 +7,7 @@ interface TechStackEcosystemProps {
 
 export const TechStackEcosystem: React.FC<TechStackEcosystemProps> = ({ centralNode, connectedNodes }) => {
     return (
-        <section className="w-full py-24 px-4 overflow-hidden">
+        <section className="w-full px-4 overflow-hidden">
             <div className="relative max-w-4xl mx-auto min-h-[500px] flex items-center justify-center">
 
                 {/* Orbit Rings (Background Decoration) */}

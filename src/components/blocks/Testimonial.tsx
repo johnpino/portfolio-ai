@@ -10,7 +10,7 @@ interface TestimonialProps {
 
 export const Testimonial: React.FC<TestimonialProps> = ({ quote, author, role, company }) => {
     return (
-        <section className="w-full py-24 px-4 max-w-4xl mx-auto text-center">
+        <section className="w-full px-4 max-w-4xl mx-auto text-center">
             <div className="relative">
                 <span className="absolute top-0 left-0 text-8xl text-purple-100 font-serif -translate-x-4 -translate-y-8 select-none">
                     “

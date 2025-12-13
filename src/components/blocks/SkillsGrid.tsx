@@ -19,7 +19,7 @@ export const SkillsGrid: React.FC<SkillsGridProps> = ({ title = CONTENT.skills.s
     }
 
     return (
-        <section className="w-full py-24 bg-slate-50 border-y border-slate-100">
+        <section className="w-full py-16 bg-slate-50 border-y border-slate-100">
             <div className="w-full px-4 max-w-7xl mx-auto">
                 {title && (
                     <h2 className="text-3xl font-bold text-slate-800 mb-12 text-center tracking-tight">{title}</h2>

@@ -10,7 +10,7 @@ interface CodeInsightProps {
 
 export const CodeInsight: React.FC<CodeInsightProps> = ({ title, code, caption }) => {
     return (
-        <section className="w-full py-16 px-4 max-w-4xl mx-auto">
+        <section className="w-full px-4 max-w-4xl mx-auto">
             {/* Window Container */}
             <div className="rounded-xl overflow-hidden bg-slate-900 shadow-2xl border border-slate-800 ring-1 ring-white/10">
 

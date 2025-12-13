@@ -14,7 +14,7 @@ export const Headline: React.FC<HeadlineProps> = ({ text, size = 'xl', align = '
     const alignClasses = align === 'left' ? 'text-left' : 'text-center';
 
     return (
-        <section className={`w-full py-16 md:py-24 px-4 max-w-5xl mx-auto ${alignClasses}`}>
+        <section className={`w-full px-4 max-w-5xl mx-auto ${alignClasses}`}>
             <h2 className={`${sizeClasses} font-bold text-slate-900 leading-tight`}>
                 {text}
             </h2>
