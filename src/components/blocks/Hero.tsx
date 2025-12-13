@@ -1,5 +1,9 @@
+'use client';
+
 import React from 'react';
 import { CONTENT } from '@/lib/dictionary';
+import { GenerativeInput } from '@/components/GenerativeInput';
+import { useLayoutContext } from '@/context/LayoutContext';
 
 interface HeroProps {
     title?: string;
@@ -9,8 +13,6 @@ interface HeroProps {
     ctaLink?: string;
 }
 
-
-
 export const Hero: React.FC<Partial<HeroProps>> = ({
     title = CONTENT.hero.title,
     role = CONTENT.hero.role,
@@ -18,9 +20,11 @@ export const Hero: React.FC<Partial<HeroProps>> = ({
     ctaText = CONTENT.hero.cta,
     ctaLink = CONTENT.hero.ctaLink
 }) => {
+    const { generateLayout, isGenerating } = useLayoutContext();
+
     return (
         <section className="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-4 max-w-5xl mx-auto">
-            <div className="flex-1 flex flex-col items-center justify-center">
+            <div className="flex-1 flex flex-col items-center justify-center pt-20">
                 <h1 className="text-6xl md:text-8xl font-light tracking-tight leading-tight bg-clip-text text-transparent bg-linear-to-r from-slate-900 to-slate-600">
                     {title}
                 </h1>
@@ -31,9 +35,17 @@ export const Hero: React.FC<Partial<HeroProps>> = ({
 
                 <div className="w-24 h-1.5 bg-accent-pink mb-10 rounded-full" />
 
-                <p className="text-xl md:text-xl text-slate-500 max-w-3xl mb-12 font-light leading-relaxed">
+                <p className="text-xl md:text-xl text-slate-500 max-w-3xl mb-8 font-light leading-relaxed">
                     {subtitle}
                 </p>
+
+                {/* Generative Input integrated here */}
+                <div className="w-full mb-12">
+                    <GenerativeInput
+                        onGenerate={generateLayout}
+                        isGenerating={isGenerating}
+                    />
+                </div>
 
                 {ctaText && (
                     <a
@@ -49,8 +61,8 @@ export const Hero: React.FC<Partial<HeroProps>> = ({
                 )}
             </div>
 
-            {/* Scroll Hint */}
-            <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2">
+            {/* Scroll Hint - Moved down */}
+            <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2">
                 <span className="text-xs md:text-sm text-slate-400 whitespace-nowrap font-light tracking-wide opacity-80">
                     {CONTENT.hero.scrollHint}
                 </span>

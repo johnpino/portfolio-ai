@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 };
 
 import { LayoutProvider } from "@/context/LayoutContext";
-import { GlobalGenerativeInput } from "@/components/GlobalGenerativeInput";
+import { ScrollToTop } from '@/components/ScrollToTop';
 
 // ... existing imports
 
@@ -38,7 +38,7 @@ export default function RootLayout({
         <LayoutProvider>
           <Hero />
           {children}
-          <GlobalGenerativeInput />
+          <ScrollToTop />
         </LayoutProvider>
         <Footer />
       </body>

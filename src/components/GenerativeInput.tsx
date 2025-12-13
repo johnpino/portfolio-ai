@@ -18,7 +18,7 @@ export const GenerativeInput: React.FC<GenerativeInputProps> = ({ onGenerate, is
     };
 
     return (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-xl px-4">
+        <div className="w-full max-w-xl mx-auto mt-10 px-4">
             <form
                 onSubmit={handleSubmit}
                 className="relative group"
