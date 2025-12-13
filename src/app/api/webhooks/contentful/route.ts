@@ -2,10 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyRequest } from '@contentful/node-apps-toolkit';
 import OpenAI from 'openai';
 import { Pinecone } from '@pinecone-database/pinecone';
+import { chunkEntry } from '@/lib/rag';
+import { getEntryById } from '@/lib/contentful';
 
-// Helper to init clients lazily to avoid build-time errors
+// Clients
 const getOpenAI = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const getPinecone = () => new Pinecone({ apiKey: process.env.PINECONE_API_KEY! });
+
 const INDEX_NAME = process.env.PINECONE_INDEX_NAME || 'portfolio-context';
 
 export async function POST(req: NextRequest) {
@@ -14,96 +17,110 @@ export async function POST(req: NextRequest) {
         const headers = Object.fromEntries(req.headers.entries());
         const secret = process.env.CONTENTFUL_WEBHOOK_SECRET!;
 
-        // 1. Verify Request
-        // Note: VerifyRequest expects a specific request shape. 
-        // We construct a canonical request object manually to satisfy the library.
-        const canonicalRequest = {
-            path: '/api/webhooks/contentful', // This might need to match the webhook config exactly
-            headers: headers,
-            method: req.method as 'POST', // Webhooks are always POST matching the library type
-            body: rawBody,
-        };
-
         try {
+            const canonicalRequest = {
+                path: '/api/webhooks/contentful',
+                headers: headers,
+                method: req.method as 'POST',
+                body: rawBody,
+            };
             if (!verifyRequest(secret, canonicalRequest)) {
                 console.error('Invalid Contentful Webhook Secret');
                 return NextResponse.json({ message: 'Invalid secret' }, { status: 401 });
             }
         } catch (e) {
-            // node-apps-toolkit might throw if headers are unusual
-            console.error('Validation error:', e);
-            // Often validation fails if the path doesn't match exactly what Contentful sent.
-            // Proceeding with caution or returning 401. 
-            // For now, let's assume if verify fails we stop.
+            console.warn('Webhook verification failed:', e);
+            // Decide if strict mode is required. For now, we return 401.
             return NextResponse.json({ message: 'Validation failed' }, { status: 401 });
         }
 
         const body = JSON.parse(rawBody);
-        const eventType = headers['x-contentful-topic'];
-        const pineconeIndex = getPinecone().index(INDEX_NAME);
-
-        // 2. Handle Events (or direct simplified calls)
-        // Check for simplified payload structure first or flexible extraction
-        const entryId = body.sys?.id || body.id;
+        const entryId = body.id || body.sys?.id;
 
         if (!entryId) {
             return NextResponse.json({ message: 'Missing entry ID' }, { status: 400 });
         }
 
-        // Determine event type equivalent if not provided in headers (fallback for manual tests)
-        // If we received a body with ID and content, treat it as a publish/update.
-        const effectiveEventType = eventType || 'ContentManagement.Entry.publish';
+        const action = headers['x-contentful-topic'] || 'ContentManagement.Entry.publish';
+        // We assume 'publish' if not specified for easy testing via curl
 
-        if (effectiveEventType === 'ContentManagement.Entry.publish' || !eventType) {
-            console.log(`Processing Publish: ${entryId}`);
+        const pineconeIndex = getPinecone().index(INDEX_NAME);
 
-            // Content Extraction Strategy
-            let contentToEmbed = '';
+        console.log(`Webhook Event: ${action} for ${entryId}`);
 
-            if (body.content && typeof body.content === 'string') {
-                // Simplified, direct content field
-                contentToEmbed = body.content;
-            } else if (body.fields) {
-                // Standard Contentful payload
-                const fields = body.fields;
-                contentToEmbed = fields.content?.['en-US'] || fields.description?.['en-US'] || fields.body?.['en-US'] || JSON.stringify(fields);
-            }
+        // Handle DELETE
+        if (action === 'ContentManagement.Entry.delete' || action === 'ContentManagement.Entry.unpublish') {
+            // We need to delete ALL chunks associated with this source
+            await deleteChunksForEntry(pineconeIndex, entryId);
+            return NextResponse.json({ success: true, action: 'deleted' });
+        }
 
-            if (!contentToEmbed) {
-                console.warn("No content to embed for", entryId);
-                return NextResponse.json({ message: "No content found" });
-            }
+        // Handle PUBLISH / AUTO_SAVE
+        // 1. Fetch full entry with resolved links (include: 2)
+        let entry;
+        try {
+            entry = await getEntryById(entryId);
+        } catch (err) {
+            console.error(`Failed to fetch entry ${entryId}:`, err);
+            return NextResponse.json({ message: 'Entry not found in Contentful' }, { status: 404 });
+        }
 
-            console.log("Generating embedding for:", entryId);
-            const openAI = getOpenAI();
-            const embedding = await openAI.embeddings.create({
+        // 2. Chunking
+        const chunks = chunkEntry(entry as any);
+        if (chunks.length === 0) {
+            console.warn(`No content chunks generated for ${entryId}`);
+            return NextResponse.json({ message: 'No content to index' });
+        }
+
+        console.log(`Generated ${chunks.length} chunks for ${entryId}`);
+
+        // 3. Generate Embeddings
+        const openAI = getOpenAI();
+        const vectors = await Promise.all(chunks.map(async (chunk) => {
+            const embeddingResponse = await openAI.embeddings.create({
                 model: 'text-embedding-3-large',
-                input: contentToEmbed,
+                input: chunk.content,
             });
 
-            const contentTypeId = body.sys?.contentType?.sys?.id || 'manual-entry';
+            // Construct Pinecone Vector
+            return {
+                id: `${chunk.internalId}#${chunk.chunkIndex}`, // Unique Vector ID
+                values: embeddingResponse.data[0].embedding,
+                metadata: {
+                    ...chunk.metadata,
+                } as any
+            };
+        }));
 
-            await pineconeIndex.upsert([
-                {
-                    id: entryId,
-                    values: embedding.data[0].embedding,
-                    metadata: {
-                        contentType: contentTypeId,
-                    }
-                },
-            ]);
-            console.log("Upserted to Pinecone");
-        }
+        // 4. Update Pinecone
+        // First, delete OLD chunks for this entry to avoid ghosts
+        await deleteChunksForEntry(pineconeIndex, entryId);
 
-        if (effectiveEventType === 'ContentManagement.Entry.delete') {
-            console.log(`Processing Delete: ${entryId}`);
-            await pineconeIndex.deleteOne(entryId);
-            console.log("Deleted from Pinecone");
-        }
+        // Then Upsert NEW chunks
+        // Batch if necessary (Pinecone max is usually 100-200 vectors per call, we likely have few)
+        await pineconeIndex.upsert(vectors);
 
-        return NextResponse.json({ success: true });
+        console.log(`Successfully indexed ${vectors.length} vectors for ${entryId}`);
+
+        return NextResponse.json({ success: true, chunkCount: vectors.length });
+
     } catch (error) {
         console.error('Webhook Error:', error);
         return NextResponse.json({ success: false, message: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
+    }
+}
+
+// Helper to delete by metadata filter
+async function deleteChunksForEntry(index: any, entryId: string) {
+    // Pinecone delete by metadata
+    try {
+        await index.deleteMany({
+            source: `contentful:${entryId}`
+        });
+        console.log(`Deleted existing chunks for source: contentful:${entryId}`);
+    } catch (e) {
+        console.error('Error deleting old chunks:', e);
+        // Don't throw, proceed to upsert? Or strict? 
+        // If delete fails, we might have duplicates. 
     }
 }

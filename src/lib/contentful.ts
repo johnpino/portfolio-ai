@@ -19,3 +19,10 @@ export async function getEntriesByIds(ids: string[]) {
 
     return response.items;
 }
+
+export async function getEntryById(id: string) {
+    const response = await getClient().getEntry<EntrySkeletonType>(id, {
+        include: 2,
+    });
+    return response;
+}
