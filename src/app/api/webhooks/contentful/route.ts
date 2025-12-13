@@ -88,6 +88,7 @@ export async function POST(req: NextRequest) {
                 values: embeddingResponse.data[0].embedding,
                 metadata: {
                     ...chunk.metadata,
+                    text: chunk.content.substring(0, 200),
                 } as any
             };
         }));

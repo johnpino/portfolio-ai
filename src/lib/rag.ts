@@ -80,51 +80,68 @@ export function chunkEntry(entry: Entry<EntrySkeletonType, undefined, string>): 
     }
 
     // Strategy 2: Smart Chunking for Long Content
-    // We want to split by logical sections but keep context.
-    // Prepend Title and Summary to EACH chunk so the LLM knows what this slice is about.
+    // Splits content into logical sections, prepending title and summary to each chunk for context.
 
     const contextHeader = [
         fields.title ? `Context: ${fields.title}` : '',
         fields.summary ? `Summary: ${fields.summary}` : ''
     ].filter(Boolean).join('\n');
 
-    // Split by H2 (##) or H3 (###) or double newline if no headers
-    // This is a naive split; we can get fancier.
-    // Let's split by double newline first to get paragraphs, then group them.
+    // Hybrid Strategy:
+    // 1. Splits content into semantic sections based on H1-H3 headers.
+    const sections = rawContent.split(/\n(?=#{1,3}\s)/);
 
-    const paragraphs = rawContent.split(/\n\n+/);
     const chunks: RagChunk[] = [];
     let currentChunkStr = '';
     const TARGET_CHUNK_SIZE = 1500;
+    // Allow some flexibility for atomic sections slightly larger than target
+    const MAX_ATOMIC_SIZE = 2000;
 
     let chunkIndex = 0;
 
-    for (const para of paragraphs) {
-        // If adding this paragraph exceeds target size (and current chunk is not empty)
-        if (currentChunkStr.length + para.length > TARGET_CHUNK_SIZE && currentChunkStr.length > 0) {
-            // Flush current chunk
-            chunks.push({
-                internalId: entryId,
-                chunkIndex,
-                content: `${contextHeader}\n\n${currentChunkStr}`.trim(),
-                metadata: { ...baseMetadata, chunkIndex }
-            });
-            chunkIndex++;
-            currentChunkStr = para;
-        } else {
-            currentChunkStr = currentChunkStr ? `${currentChunkStr}\n\n${para}` : para;
-        }
-    }
-
-    // Flush remaining
-    if (currentChunkStr.length > 0) {
+    const flushChunk = () => {
+        if (!currentChunkStr) return;
         chunks.push({
             internalId: entryId,
             chunkIndex,
             content: `${contextHeader}\n\n${currentChunkStr}`.trim(),
             metadata: { ...baseMetadata, chunkIndex }
         });
+        chunkIndex++;
+        currentChunkStr = '';
+    };
+
+    for (const section of sections) {
+        const trimmedSection = section.trim();
+        if (!trimmedSection) continue;
+
+        // 2. Safety Check: If a header-defined section is too large, split by paragraphs.
+        if (trimmedSection.length > MAX_ATOMIC_SIZE) {
+            // Flush valid accumulated content first
+            flushChunk();
+
+            const paragraphs = trimmedSection.split(/\n\n+/);
+            for (const para of paragraphs) {
+                if (currentChunkStr.length + para.length > TARGET_CHUNK_SIZE && currentChunkStr.length > 0) {
+                    flushChunk();
+                    currentChunkStr = para;
+                } else {
+                    currentChunkStr = currentChunkStr ? `${currentChunkStr}\n\n${para}` : para;
+                }
+            }
+        } else {
+            // 3. Standard accumulation: Group smaller sections until target size is reached.
+            if (currentChunkStr.length + trimmedSection.length > TARGET_CHUNK_SIZE && currentChunkStr.length > 0) {
+                flushChunk();
+                currentChunkStr = trimmedSection;
+            } else {
+                currentChunkStr = currentChunkStr ? `${currentChunkStr}\n\n${trimmedSection}` : trimmedSection;
+            }
+        }
     }
+
+    // Final flush
+    flushChunk();
 
     // Fallback: If no content, just index title/summary? 
     if (chunks.length === 0 && (fields.title || fields.summary)) {
