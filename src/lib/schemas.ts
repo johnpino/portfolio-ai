@@ -168,7 +168,6 @@ export const TechEcosystemBlockSchema = BaseBlockSchema.extend({
 export const SimpleTextBlockPropsSchema = z.object({
     title: z.string(),
     content: z.string(),
-    style: z.enum(['simple', 'bordered', 'accent']).default('accent'),
 });
 export const SimpleTextBlockSchema = BaseBlockSchema.extend({
     type: z.literal('simple-text-block'),
