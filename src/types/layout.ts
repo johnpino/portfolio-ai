@@ -9,7 +9,8 @@ export type BlockType =
     | 'testimonial'
     | 'career-timeline'
     | 'tech-ecosystem'
-    | 'gallery';
+    | 'gallery'
+    | 'simple-text-block';
 
 export interface LayoutBlock {
     id: string;

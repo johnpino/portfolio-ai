@@ -12,6 +12,7 @@ import { Testimonial } from './blocks/Testimonial';
 import { CareerTimeline } from './blocks/CareerTimeline';
 import { TechStackEcosystem } from './blocks/TechStackEcosystem';
 import { Gallery } from './blocks/Gallery';
+import { SimpleTextBlock } from './blocks/SimpleTextBlock';
 
 // Map string types to actual React components
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,6 +28,7 @@ const BLOCK_COMPONENTS: Record<BlockType, React.FC<any>> = {
     'career-timeline': CareerTimeline,
     'tech-ecosystem': TechStackEcosystem,
     'gallery': Gallery,
+    'simple-text-block': SimpleTextBlock,
 };
 
 interface DynamicLayoutProps {

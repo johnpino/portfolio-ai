@@ -164,6 +164,18 @@ export const TechEcosystemBlockSchema = BaseBlockSchema.extend({
 });
 
 
+// 13. Simple Text Block
+export const SimpleTextBlockPropsSchema = z.object({
+    title: z.string(),
+    content: z.string(),
+    style: z.enum(['simple', 'bordered', 'accent']).default('accent'),
+});
+export const SimpleTextBlockSchema = BaseBlockSchema.extend({
+    type: z.literal('simple-text-block'),
+    props: SimpleTextBlockPropsSchema,
+});
+
+
 // Discriminated Union of All Blocks (using z.union for OpenAI compatibility)
 export const LayoutBlockTypeSchema = z.union([
     HeadlineBlockSchema,
@@ -174,6 +186,7 @@ export const LayoutBlockTypeSchema = z.union([
     CareerTimelineBlockSchema,
     CaseStudiesListBlockSchema,
     GalleryBlockSchema,
+    SimpleTextBlockSchema,
     //SystemMetricsBlockSchema,
     //CodeInsightBlockSchema,
     //TechEcosystemBlockSchema,
