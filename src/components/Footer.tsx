@@ -7,7 +7,7 @@ export const Footer = () => {
                 <p>© {new Date().getFullYear()} John Pino. All rights reserved.</p>
                 <div className="flex items-center space-x-6 mt-4 md:mt-0">
                     <a
-                        href="https://www.linkedin.com/in/johnpino"
+                        href="https://www.linkedin.com/in/john-pino"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="hover:text-accent-pink transition-colors flex items-center gap-2"
