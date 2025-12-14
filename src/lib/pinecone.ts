@@ -27,3 +27,27 @@ export async function queryProfileData(query: string, topK: number = 15, filter?
         return [];
     }
 }
+
+export async function deleteChunksForEntry(entryId: string) {
+    try {
+        const index = pinecone.index(INDEX_NAME);
+        await index.deleteMany({
+            source: `contentful:${entryId}`
+        } as any); // Type cast if necessary depending on SDK version
+        console.log(`Deleted existing chunks for source: contentful:${entryId}`);
+    } catch (e) {
+        console.error('Error deleting old chunks:', e);
+        throw e;
+    }
+}
+
+export async function upsertVectors(vectors: any[]) {
+    try {
+        const index = pinecone.index(INDEX_NAME);
+        await index.upsert(vectors);
+        console.log(`Upserted ${vectors.length} vectors.`);
+    } catch (e) {
+        console.error('Error upserting vectors:', e);
+        throw e;
+    }
+}
