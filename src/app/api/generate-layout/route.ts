@@ -3,6 +3,8 @@ import { queryProfileData } from '@/lib/pinecone'; // This returns IDs or matche
 import { generateLayoutWithContext, detectSearchIntent } from '@/lib/openai';
 import { getEntriesByIds } from '@/lib/contentful';
 
+import { DEFAULT_LAYOUT_PROMPT } from '@/lib/prompts';
+
 export async function POST(request: Request) {
     let prompt = "";
 
@@ -18,7 +20,7 @@ export async function POST(request: Request) {
     }
 
     try {
-        const userQuery = prompt || "Create a comprehensive portfolio layout showcasing my entire professional background, including all my key skills, detailed experience, and major projects. Use a rich variety of blocks.";
+        const userQuery = prompt || DEFAULT_LAYOUT_PROMPT;
 
         // 1. Analyze Intent (LLM)
         const intent = await detectSearchIntent(userQuery);
