@@ -35,15 +35,16 @@ export async function POST(request: Request) {
 
         // 2. Fetch Content from Contentful (Source of Truth)
         // Extract IDs from matches
-        // Wait, 'queryProfileData' currently returns string[] (the text).
-        // I MUST refactor 'queryProfileData' first or simultaneously.
-        // I will assume it returns { id: string }[] in the next step.
-        // For now, let's update this file to use a NEW function 'queryPineconeIds' or update the existing one.
-        // I'll update the existing one in the next tool call.
+        // We must use 'internalId' (clean Contentful ID) not the vector ID (which contains #chunk hash)
+        // Also deduplicate, as multiple chunks from same entry might match.
 
-        const ids = pineconeMatches.map((m: any) => m.id as string); // Type safe? I'll fix the lib.
+        const rawIds = pineconeMatches.map((m: any) => {
+            return m.metadata?.internalId || m.id.split('#')[0];
+        });
 
-        console.log("Pinecone IDs found:", ids);
+        const ids = Array.from(new Set(rawIds));
+
+        console.log("Pinecone IDs found (Clean & Unique):", ids);
 
         // 3. Hydrate with Contentful Data
         const contentfulEntries = await getEntriesByIds(ids);
