@@ -207,11 +207,11 @@ export const PortfolioLayoutSchema = z.object({
 // Search Intent Schema (Moved from openai.ts)
 export const SearchIntentSchema = z.object({
     optimizedQuery: z.string().describe("Rewritten search query optimized for functionality"),
-    topK: z.number().optional().describe("Number of results to fetch (default 15). Boost to 30 for broad queries like 'summarize everything'."),
+    topK: z.number().nullable().describe("Number of results to fetch (default 15). Boost to 30 for broad queries like 'summarize everything'."),
     filters: z.object({
-        type: z.object({ $in: z.array(z.string()) }).optional(),
-        stack: z.object({ $in: z.array(z.string()) }).optional(),
-        tags: z.object({ $in: z.array(z.string()) }).optional(),
-        audience: z.object({ $in: z.array(z.string()) }).optional(),
-    }).optional().describe("Pinecone metadata filters"),
+        type: z.object({ $in: z.array(z.string()) }).nullable(),
+        stack: z.object({ $in: z.array(z.string()) }).nullable(),
+        tags: z.object({ $in: z.array(z.string()) }).nullable(),
+        audience: z.object({ $in: z.array(z.string()) }).nullable(),
+    }).nullable().describe("Pinecone metadata filters"),
 });

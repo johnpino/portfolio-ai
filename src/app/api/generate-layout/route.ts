@@ -30,8 +30,21 @@ export async function POST(request: Request) {
         }
 
         const optimizedQuery = intent?.optimizedQuery || userQuery;
-        const filters = intent?.filters;
-        const topK = intent?.topK;
+
+        // Sanitize filters: Remove nulls (OpenAI strict mode returns nulls, Pinecone wants undefined)
+        let filters: Record<string, any> | undefined = undefined;
+        if (intent?.filters) {
+            const cleanFilters = Object.entries(intent.filters).reduce((acc, [k, v]) => {
+                if (v !== null && v !== undefined) acc[k] = v;
+                return acc;
+            }, {} as Record<string, any>);
+
+            if (Object.keys(cleanFilters).length > 0) {
+                filters = cleanFilters;
+            }
+        }
+
+        const topK = intent?.topK ?? 15;
 
         console.log("Search Intent:", { optimizedQuery, filters, topK });
 
