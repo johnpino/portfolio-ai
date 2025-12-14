@@ -31,8 +31,7 @@ export async function detectSearchIntent(userPrompt: string) {
       },
       { role: 'user', content: userPrompt },
     ],
-    text: { format: zodTextFormat(SearchIntentSchema, "search_intent") },
-    reasoning: { effort: "low" },
+    text: { format: zodTextFormat(SearchIntentSchema, "search_intent") }
   });
 
   return response.output_parsed;
