@@ -33,7 +33,7 @@ export async function deleteChunksForEntry(entryId: string) {
         const index = pinecone.index(INDEX_NAME);
         await index.deleteMany({
             filter: {
-                source: `contentful:${entryId}`
+                source: { $eq: `contentful:${entryId}` }
             }
         });
         console.log(`Deleted existing chunks for source: contentful:${entryId}`);
