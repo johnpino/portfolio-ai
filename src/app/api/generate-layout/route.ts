@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { queryProfileData } from '@/lib/pinecone'; // This returns IDs or matches now? We need to update this lib too.
-import { generateLayoutWithContext } from '@/lib/openai';
+import { generateLayoutWithContext, detectSearchIntent } from '@/lib/openai';
 import { getEntriesByIds } from '@/lib/contentful';
 
 export async function POST(request: Request) {
@@ -20,20 +20,23 @@ export async function POST(request: Request) {
     try {
         const userQuery = prompt || "Create a comprehensive portfolio layout showcasing my entire professional background, including all my key skills, detailed experience, and major projects. Use a rich variety of blocks.";
 
-        // 1. Retrieve IDs from Pinecone (Vector Search)
-        // We need to check if queryProfileData returns IDs or text.
-        // Currently it returns text (matches.metadata.text).
-        // I need to update lib/pinecone.ts to return IDs!
-        // But for now let's assume I fix that next.
-        // Let's assume queryVectorIDs(query) returns string[].
+        // 1. Analyze Intent (LLM)
+        const intent = await detectSearchIntent(userQuery);
 
-        // STOP: I need to update pinecone.ts FIRST to return IDs/Matches, not Strings.
-        // But I can write this file assuming the new signature.
+        if (!intent) {
+            console.warn("Intent detection failed, falling back to raw query.");
+        }
 
-        const pineconeMatches = await queryProfileData(userQuery);
-        // Note: I will modify 'queryProfileData' to return { id: string, score: number }[] instead of string[]
+        const optimizedQuery = intent?.optimizedQuery || userQuery;
+        const filters = intent?.filters;
+        const topK = intent?.topK;
 
-        // 2. Fetch Content from Contentful (Source of Truth)
+        console.log("Search Intent:", { optimizedQuery, filters, topK });
+
+        // 2. Retrieve IDs from Pinecone (Vector Search + Filters)
+        const pineconeMatches = await queryProfileData(optimizedQuery, topK || 15, filters);
+
+        // 3. Fetch Content from Contentful (Source of Truth)
         // Extract IDs from matches
         // We must use 'internalId' (clean Contentful ID) not the vector ID (which contains #chunk hash)
         // Also deduplicate, as multiple chunks from same entry might match.
@@ -46,10 +49,10 @@ export async function POST(request: Request) {
 
         console.log("Pinecone IDs found (Clean & Unique):", ids);
 
-        // 3. Hydrate with Contentful Data
+        // 4. Hydrate with Contentful Data
         const contentfulEntries = await getEntriesByIds(ids);
 
-        // 4. Format Context for AI
+        // 5. Format Context for AI
         const context = contentfulEntries.map((entry: any) => {
             // Flatten entry fields to a string
             return JSON.stringify(entry.fields);
@@ -57,7 +60,7 @@ export async function POST(request: Request) {
 
         console.log(`Hydrated ${context.length} entries from Contentful`);
 
-        // 5. Generate Layout
+        // 6. Generate Layout
         const layout = await generateLayoutWithContext(userQuery, context);
 
         return NextResponse.json(layout);

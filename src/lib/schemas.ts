@@ -203,3 +203,15 @@ export const LayoutBlockTypeSchema = z.union([
 export const PortfolioLayoutSchema = z.object({
     layout: z.array(LayoutBlockTypeSchema),
 });
+
+// Search Intent Schema (Moved from openai.ts)
+export const SearchIntentSchema = z.object({
+    optimizedQuery: z.string().describe("Rewritten search query optimized for functionality"),
+    topK: z.number().optional().describe("Number of results to fetch (default 15). Boost to 30 for broad queries like 'summarize everything'."),
+    filters: z.object({
+        type: z.object({ $in: z.array(z.string()) }).optional(),
+        stack: z.object({ $in: z.array(z.string()) }).optional(),
+        tags: z.object({ $in: z.array(z.string()) }).optional(),
+        audience: z.object({ $in: z.array(z.string()) }).optional(),
+    }).optional().describe("Pinecone metadata filters"),
+});

@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
 import { LayoutConfig } from '@/types/layout';
-import { PortfolioLayoutSchema } from './schemas';
+import { PortfolioLayoutSchema, SearchIntentSchema } from './schemas';
 
 const apiKey = process.env.OPENAI_API_KEY || "dummy-key-for-build";
 const openai = new OpenAI({
@@ -18,7 +18,6 @@ export async function generateEmbedding(text: string) {
 }
 
 // 2. System Prompt Context
-// Schema is now handled by Zod, simplified prompt.
 const SYSTEM_PROMPT = `
     You are an expert Portfolio Designer responsible for creating a personalized portfolio layout JSON.
     
@@ -40,7 +39,39 @@ const SYSTEM_PROMPT = `
     8. IF THE USER SPECIFIES AN ORDER OF BLOCKS, YOU MUST FOLLOW IT EXACTLY. Map their requests to the available schema types (quick-resume, skills-grid, career-timeline, case-studies-list, simple-text-block, etc.).
 `;
 
-// 3. Generate Layout
+// 3. Search Intent Detection
+export async function detectSearchIntent(userPrompt: string) {
+  const response = await openai.responses.parse({
+    model: 'gpt-4o-mini',
+    input: [
+      {
+        role: 'system',
+        content: `You are a Search Specialist for a Portfolio RAG system.
+        Analyze the user's prompt and extract a structured search query.
+        
+        METADATA FIELDS AVAILABLE:
+        - type: ['project', 'experience', 'skill', 'bio', 'blog', 'talk', 'education']
+        - stack: (Techniques/Tools e.g., 'React', 'TypeScript', 'AWS', 'Node.js')
+        - tags: (General topics e.g., 'frontend', 'backend', 'leadership', 'mobile')
+        - audience: ['recruiter', 'engineer', 'nonTechnical']
+
+        RULES:
+        1. If user asks for specific technology (e.g. "React projects"), add a filter for stack: { $in: ['React'] }.
+        2. If user asks for "experience" or "projects", filter by type.
+        3. For broad queries ("tell me about yourself"), do NOT apply strict filters.
+        4. Rewrite the query to be semantic and keyword-rich.
+        `
+      },
+      { role: 'user', content: userPrompt },
+    ],
+    text: { format: zodTextFormat(SearchIntentSchema, "search_intent") },
+    reasoning: { effort: "low" },
+  });
+
+  return response.output_parsed;
+}
+
+// 4. Generate Layout
 export async function generateLayoutWithContext(userPrompt: string, context: string[]): Promise<LayoutConfig> {
   const contextString = context.length > 0 ? context.join('\n\n') : "NO CONTEXT FOUND.";
   const finalPrompt = `
@@ -53,7 +84,7 @@ export async function generateLayoutWithContext(userPrompt: string, context: str
 
   // Use Structured Outputs via Zod
   const response = await openai.responses.parse({
-    model: 'gpt-5-nano', // Ensuring model supports Structured Outputs
+    model: 'gpt-5-nano',
     input: [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: finalPrompt },
@@ -74,7 +105,6 @@ export async function generateLayoutWithContext(userPrompt: string, context: str
   }
 
   if (!layoutConfig) {
-    console.error("No layout config and no refusal. Full Response:", JSON.stringify(response, null, 2));
     throw new Error('No structured layout generated');
   }
 
