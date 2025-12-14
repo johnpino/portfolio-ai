@@ -195,7 +195,7 @@ export const LayoutBlockTypeSchema = z.union([
     GalleryBlockSchema,
     SimpleTextBlockSchema,
     //SystemMetricsBlockSchema,
-    //CodeInsightBlockSchema,
+    CodeInsightBlockSchema,
     //TechEcosystemBlockSchema,
 ]);
 
