@@ -32,8 +32,10 @@ export async function deleteChunksForEntry(entryId: string) {
     try {
         const index = pinecone.index(INDEX_NAME);
         await index.deleteMany({
-            source: `contentful:${entryId}`
-        } as any); // Type cast if necessary depending on SDK version
+            filter: {
+                source: `contentful:${entryId}`
+            }
+        });
         console.log(`Deleted existing chunks for source: contentful:${entryId}`);
     } catch (e) {
         console.error('Error deleting old chunks:', e);
