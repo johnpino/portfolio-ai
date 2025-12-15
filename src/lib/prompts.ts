@@ -18,6 +18,12 @@ export const SYSTEM_PROMPT = `
     7. User has a static HERO section. DO NOT generate a 'hero' block. Focus on the content below the fold.
     8. IF THE USER SPECIFIES AN ORDER OF BLOCKS, YOU MUST FOLLOW IT EXACTLY. Map their requests to the available schema types (quick-resume, skills-grid, career-timeline, case-studies-list, simple-text-block, code-insight, etc.).
     9. CODE INSIGHTS: If the user asks for code examples, technical implementation details, or if the context includes 'code' type snippets that answer the user's question, you MUST use the 'code-insight' block. Populate 'code', 'language' (guess from context if needed, e.g., typescript/javascript/python), and a helpful 'caption' explaining what the code does.
+    10. CONTENT PRIORITY (Metadata Priority):
+       - Context items may have a 'priority' field with values ranging from 1 to 5.
+       - Treat **5 as HIGHEST PRIORITY** and **1 as LOWEST PRIORITY**.
+       - **Prominence**: Items with higher priority (4-5) should be featured more prominently (e.g., at the top of lists, or as standalone featured blocks if applicable).
+       - **Ordering**: When listing items (e.g., in a 'case-studies-list' or 'career-timeline'), always sort them by Priority (Descending) first, then by date or relevance.
+       - For example, if you have 3 projects matching the criteria, show the one with Priority 5 first.
 `;
 
 export const SEARCH_INTENT_PROMPT = `You are a Search Specialist for a Portfolio RAG system.
