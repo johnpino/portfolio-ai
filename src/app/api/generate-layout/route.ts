@@ -35,7 +35,19 @@ export async function POST(request: Request) {
         let filters: Record<string, any> | undefined = undefined;
         if (intent?.filters) {
             const cleanFilters = Object.entries(intent.filters).reduce((acc, [k, v]) => {
-                if (v !== null && v !== undefined) acc[k] = v;
+                if (v !== null && v !== undefined) {
+                    // Normalize: If it's a string, lower command. If it's an object with $in, lower the array items.
+                    if (typeof v === 'string') {
+                        acc[k] = (v as string).toLowerCase();
+                    } else if (typeof v === 'object' && v.$in && Array.isArray(v.$in)) {
+                        if (v.$in.length > 0) {
+                            acc[k] = { ...v, $in: v.$in.map((item: any) => String(item).toLowerCase()) };
+                        }
+                        // If empty array, DO NOT include key. "$in: []" matches nothing in most DBs.
+                    } else {
+                        acc[k] = v;
+                    }
+                }
                 return acc;
             }, {} as Record<string, any>);
 
@@ -46,7 +58,7 @@ export async function POST(request: Request) {
 
         const topK = intent?.topK ?? 15;
 
-        console.log("Search Intent:", { optimizedQuery, filters, topK });
+        console.log("Search Intent:", JSON.stringify({ optimizedQuery, filters, topK }));
 
         // 2. Retrieve IDs from Pinecone (Vector Search + Filters)
         const pineconeMatches = await queryProfileData(optimizedQuery, topK || 15, filters);

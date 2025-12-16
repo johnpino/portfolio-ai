@@ -36,9 +36,9 @@ export function chunkEntry(entry: Entry<EntrySkeletonType, undefined, string>): 
 
     // Base Metadata
     // arrays might be undefined, ensure []
-    const audience = fields.audience || [];
-    const tags = fields.tags || [];
-    const stack = fields.stack || [];
+    const audience = (fields.audience || []).map((s: string) => s.toLowerCase());
+    const tags = (fields.tags || []).map((s: string) => s.toLowerCase());
+    const stack = (fields.stack || []).map((s: string) => s.toLowerCase());
     const priority = fields.priority || 1;
     const slug = fields.slug || entryId;
     const locale = 'en-US'; // Default for now
@@ -46,7 +46,7 @@ export function chunkEntry(entry: Entry<EntrySkeletonType, undefined, string>): 
     const baseMetadata: Omit<RagMetadata, 'chunkIndex'> = {
         internalId: entryId,
         locale,
-        type: contentType,
+        type: contentType.toLowerCase(),
         audience,
         tags,
         stack,

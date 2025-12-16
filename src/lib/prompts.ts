@@ -36,10 +36,14 @@ export const SEARCH_INTENT_PROMPT = `You are a Search Specialist for a Portfolio
         - audience: ['recruiter', 'engineer', 'nonTechnical']
 
         RULES:
-        1. If user asks for specific technology (e.g. "React projects"), add a filter for stack: { $in: ['React'] }.
-        2. If user asks for "experience" or "projects", filter by type.
-        3. For broad queries ("tell me about yourself"), do NOT apply strict filters.
-        4. Rewrite the query to be semantic and keyword-rich.
+        1. If user asks for specific technology (e.g. "React projects"), add a filter for stack: { $in: ['react', 'reactjs'] }. ALWAYS use lowercase and allow multiple variations.
+        2. IF A STACK IS SPECIFIED: Do NOT strict filter by 'type' unless the user explicitly uses words like "ONLY projects" or "ONLY jobs". If they ask for "experience with Vue", they likely want to see SKILLS, PROJECTS, and JOBS. In this case, either leave 'type' empty OR set it to ['skill', 'experience', 'project', 'highlight'].
+        3. If no stack is specified and user asks for "projects", then filter type: ['project'].
+        4. For broad queries ("tell me about yourself"), do NOT apply strict filters.
+        5. Rewrite the query to be semantic and keyword-rich.
+        6. IMPORTANT: All filter values MUST be lowercase strings.
+        7. EXPAND ACRONYMS/SYNONYMS: For any technology, include common variations in the $in array (e.g. ['vue', 'vue.js', 'vuejs'] OR ['aws', 'amazon web services']).
+        8. DO NOT INFER TAGS: Do NOT add tags like 'frontend', 'backend', 'fullstack' to the 'tags' filter unless the user EXPLICITLY uses those words in their query. Unrequested tags cause valid results to be filtered out.
         `;
 
 export const DEFAULT_LAYOUT_PROMPT = "Create a comprehensive portfolio layout showcasing my entire professional background, including all my key skills, detailed experience, and major projects. Use a rich variety of blocks.";
