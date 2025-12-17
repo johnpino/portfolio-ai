@@ -11,24 +11,25 @@ export default function Home() {
   const { layout, loading, isGenerating } = useLayoutContext();
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll when layout is populated and not initial loading
-  const isInitialLoad = useRef(true);
+  // Track generation state
+  const isInitialGeneration = useRef(true);
 
-  // Auto-scroll when layout is populated and not initial loading
+  // Trigger scroll on Start of Generation (Rising Edge)
   useEffect(() => {
-    if (layout && !loading && !isGenerating && contentRef.current) {
-      // Prevent scroll on initial load
-      if (isInitialLoad.current) {
-        isInitialLoad.current = false;
-        return;
+    if (isGenerating) {
+      if (isInitialGeneration.current) {
+        // First load - Do NOT scroll
+        isInitialGeneration.current = false;
+      } else {
+        // Subsequent generation - Scroll to main content area immediately
+        // We use window height because the Hero is min-h-screen
+        window.scrollTo({
+          top: window.innerHeight,
+          behavior: 'smooth'
+        });
       }
-
-      // Small timeout to ensure DOM render
-      setTimeout(() => {
-        contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 500);
     }
-  }, [layout, loading, isGenerating]);
+  }, [isGenerating]);
 
   // If loading and NO layout, show full screen skeleton. 
   // If we have a layout but are regenerating, we might want to just show the spinner in the input (handled by GlobalInput)
