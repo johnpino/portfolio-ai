@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CONTENT } from '@/lib/dictionary';
 
 interface GenerativeInputProps {
-    onGenerate: (prompt: string) => Promise<void>;
+    onGenerate: (prompt: string) => Promise<void> | void;
     isGenerating: boolean;
 }
 

@@ -31,6 +31,11 @@ export default function Home() {
     return <div className="text-center p-10">Failed to load content.</div>;
   }
 
+  // Handle "Finished but Empty"
+  if (!loading && !isGenerating && layout.layout?.length === 0) {
+    return <div className="text-center p-10 text-slate-500">No content generated. Try again?</div>;
+  }
+
   return (
     <main className="relative">
       <motion.div

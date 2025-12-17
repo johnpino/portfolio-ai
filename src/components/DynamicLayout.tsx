@@ -1,6 +1,6 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { LayoutConfig, BlockType } from '@/types/layout';
-import { Hero } from './blocks/Hero';
 import { SkillsGrid } from './blocks/SkillsGrid';
 import { CaseStudies } from './blocks/CaseStudies';
 import { Headline } from './blocks/Headline';
@@ -37,23 +37,38 @@ interface DynamicLayoutProps {
 
 export const DynamicLayout: React.FC<DynamicLayoutProps> = ({ layout }) => {
     if (!layout?.layout || layout.layout.length === 0) {
-        return <div className="p-10 text-center text-slate-500">No layout configuration provided.</div>;
+        return null; // Don't show error, just wait for content (SkeletonLoader context typically handles loading state)
     }
 
     return (
         <main className="flex flex-col gap-24 md:gap-32 pb-24">
-            {layout.layout.map((block) => {
+            {layout.layout?.map((block, index) => {
+                // Determine component
+                if (!block?.type) return null;
                 const Component = BLOCK_COMPONENTS[block.type];
 
                 if (!Component) {
-                    console.warn(`Unknown block type: ${block.type}`);
+                    // console.warn(`Unknown block type: ${block.type}`);
                     return null;
                 }
 
+                // Safety for streaming: If props aren't ready, don't render yet
+                if (!block.props) return null;
+
+                // Use block.id if available, otherwise fallback to index.
+                // Using index is safe enough for streaming append-only lists.
+                const key = block.id || index;
+
                 return (
-                    <div key={block.id}>
+                    <motion.div
+                        key={key}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        className="w-full"
+                    >
                         <Component {...block.props} />
-                    </div>
+                    </motion.div>
                 );
             })}
         </main>

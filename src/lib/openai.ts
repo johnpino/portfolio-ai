@@ -1,8 +1,7 @@
 import OpenAI from 'openai';
 import { zodTextFormat } from 'openai/helpers/zod';
-import { LayoutConfig } from '@/types/layout';
-import { PortfolioLayoutSchema, SearchIntentSchema } from './schemas';
-import { SYSTEM_PROMPT, SEARCH_INTENT_PROMPT } from './prompts';
+import { SearchIntentSchema } from './schemas';
+import { SEARCH_INTENT_PROMPT } from './prompts';
 
 const apiKey = process.env.OPENAI_API_KEY || "dummy-key-for-build";
 const openai = new OpenAI({
@@ -35,44 +34,4 @@ export async function detectSearchIntent(userPrompt: string) {
   });
 
   return response.output_parsed;
-}
-
-// 4. Generate Layout
-export async function generateLayoutWithContext(userPrompt: string, context: string[]): Promise<LayoutConfig> {
-  const contextString = context.length > 0 ? context.join('\n\n') : "NO CONTEXT FOUND.";
-  const finalPrompt = `
-    PROFILE CONTEXT (RAG DATA):
-    ${contextString}
-
-    USER REQUEST:
-    ${userPrompt}
-  `;
-
-  // Use Structured Outputs via Zod
-  const response = await openai.responses.parse({
-    model: 'gpt-5-nano',
-    input: [
-      { role: 'system', content: SYSTEM_PROMPT },
-      { role: 'user', content: finalPrompt },
-    ],
-    text: {
-      format: zodTextFormat(PortfolioLayoutSchema, "portfolio_layout"),
-    },
-    reasoning: {
-      effort: "low"
-    },
-  });
-
-  const layoutConfig = response.output_parsed;
-
-  if ((response as any).refusal) {
-    console.error("OpenAI Refusal:", (response as any).refusal);
-    throw new Error(`AI Refusal: ${(response as any).refusal}`);
-  }
-
-  if (!layoutConfig) {
-    throw new Error('No structured layout generated');
-  }
-
-  return layoutConfig as LayoutConfig;
 }

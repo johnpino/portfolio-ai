@@ -1,49 +1,68 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
+import { z } from 'zod';
 import { LayoutConfig } from '@/types/layout';
+import { experimental_useObject as useObject } from '@ai-sdk/react';
+import { LayoutBlockTypeSchema } from '@/lib/schemas';
 
+/**
+ * Context state definition.
+ */
 interface LayoutContextType {
     layout: LayoutConfig | null;
     loading: boolean;
     isGenerating: boolean;
-    generateLayout: (prompt: string) => Promise<void>;
+    generateLayout: (prompt: string) => void;
 }
 
 const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 
+/**
+ * Provides the layout configuration to the application.
+ * Manages the streaming state from Vercel AI SDK and persists the final layout.
+ */
 export const LayoutProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [layout, setLayout] = useState<LayoutConfig | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [isGenerating, setIsGenerating] = useState(false);
+    // We keep a local "final" layout state to persist data after stream or if we load it differently
+    const [finalLayout, setFinalLayout] = useState<LayoutConfig | null>(null);
+    const hasStartedRef = useRef(false);
 
-    // Initial Load
+    const { object, submit, isLoading, error } = useObject({
+        api: '/api/generate-layout',
+        schema: z.array(LayoutBlockTypeSchema),
+        onFinish: ({ object }) => {
+            if (object) {
+                // Wrap array in layout config object as the final state
+                setFinalLayout({ layout: object });
+            }
+        },
+        onError: (e: any) => {
+            console.error("Streaming Result Error:", e);
+        }
+    });
+
+    // The active layout is either the streaming partial object (wrapped) or the final saved one.
+    // While streaming, 'object' is the partial array accumulating blocks.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const layout = finalLayout || (object ? { layout: object as any[] } : null);
+
+    // Trigger initial generation on mount if not already done
     useEffect(() => {
-        // We only trigger the initial generation if no layout exists yet
-        if (!layout) {
-            generateLayout('Create a comprehensive professional portfolio showcasing my profile as a Lead. The layout MUST follow this specific order of blocks: 1. A very detailed "quick-resume" block. 2. A "skills-grid" block. 3. A "career-timeline" block. 4. "case-studies-list" blocks. 5. Any complementary blocks that enhance my profile as a Lead (e.g., testimonials, philosophy, etc.). Ensure the QuickResume is prominent and detailed.');
+        if (!finalLayout && !hasStartedRef.current) {
+            hasStartedRef.current = true;
+            submit({ prompt: 'Create a comprehensive professional portfolio showcasing my profile as a Lead. The layout MUST follow this specific order of blocks: 1. A very detailed "quick-resume" block. 2. A "skills-grid" block. 3. A "career-timeline" block. 4. "case-studies-list" blocks. 5. Any complementary blocks that enhance my profile as a Lead (e.g., testimonials, philosophy, etc.). Ensure the QuickResume is prominent and detailed.' });
         }
-    }, []);
+    }, [finalLayout, submit]);
 
-    const generateLayout = async (prompt: string) => {
-        setIsGenerating(true);
-        // Only show full loading state if we don't have a layout (initial load)
-        if (!layout) setLoading(true);
-
-        try {
-            const res = await fetch('/api/generate-layout', {
-                method: 'POST',
-                body: JSON.stringify({ prompt }),
-            });
-            const data = await res.json();
-            setLayout(data);
-        } catch (error) {
-            console.error('Failed to load layout:', error);
-        } finally {
-            setLoading(false);
-            setIsGenerating(false);
-        }
+    const generateLayout = (prompt: string) => {
+        setFinalLayout(null); // Clear previous layout to show the new stream forming
+        submit({ prompt });
     };
+
+    const isGenerating = isLoading;
+    // Loading is true if we are expecting data (isLoading) but have no data yet (!layout).
+    // This allows showing a skeleton state initially, then showing the stream as it arrives.
+    const loading = isLoading && !layout;
 
     return (
         <LayoutContext.Provider value={{ layout, loading, isGenerating, generateLayout }}>
@@ -52,6 +71,10 @@ export const LayoutProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     );
 };
 
+/**
+ * Hook to access the layout context.
+ * Throws an error if used outside of LayoutProvider.
+ */
 export const useLayoutContext = () => {
     const context = useContext(LayoutContext);
     if (!context) {

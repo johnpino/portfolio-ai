@@ -1,10 +1,22 @@
-import { NextResponse } from 'next/server';
-import { queryProfileData } from '@/lib/pinecone'; // This returns IDs or matches now? We need to update this lib too.
-import { generateLayoutWithContext, detectSearchIntent } from '@/lib/openai';
+import { streamObject } from 'ai';
+import { google } from '@ai-sdk/google';
+import { queryProfileData } from '@/lib/pinecone';
+import { detectSearchIntent } from '@/lib/openai';
 import { getEntriesByIds } from '@/lib/contentful';
+import { LayoutBlockTypeSchema } from '@/lib/schemas';
+import { DEFAULT_LAYOUT_PROMPT, SYSTEM_PROMPT } from '@/lib/prompts';
 
-import { DEFAULT_LAYOUT_PROMPT } from '@/lib/prompts';
 
+
+/**
+ * Generates a portfolio layout based on the user's prompt.
+ * 
+ * Uses RAG (Pinecone + Contentful) to retrieve context and Vercel AI SDK
+ * to stream the layout generation as an array of blocks.
+ * 
+ * @param request - The incoming HTTP request containing the prompt.
+ * @returns A streaming text response containing the generated layout blocks.
+ */
 export async function POST(request: Request) {
     let prompt = "";
 
@@ -15,84 +27,92 @@ export async function POST(request: Request) {
         console.warn("Failed to parse request body", e);
     }
 
-    if (!process.env.OPENAI_API_KEY) {
-        return NextResponse.json({ error: "OpenAI API Key missing" }, { status: 500 });
+    const userQuery = prompt || DEFAULT_LAYOUT_PROMPT;
+
+    // 1. Analyze Intent (LLM) - Blocked for now, usually fast (0.5s)
+    const intent = await detectSearchIntent(userQuery);
+    console.log("Detected Intent:", JSON.stringify(intent, null, 2));
+
+    const optimizedQuery = intent?.optimizedQuery || userQuery;
+
+    // Sanitize filters
+    let filters: Record<string, any> | undefined = undefined;
+    if (intent?.filters) {
+        const cleanFilters = Object.entries(intent.filters).reduce((acc, [k, v]) => {
+            if (v !== null && v !== undefined) {
+                if (typeof v === 'string') {
+                    acc[k] = (v as string).toLowerCase();
+                } else if (typeof v === 'object' && v.$in && Array.isArray(v.$in)) {
+                    if (v.$in.length > 0) {
+                        acc[k] = { ...v, $in: v.$in.map((item: any) => String(item).toLowerCase()) };
+                    }
+                } else {
+                    acc[k] = v;
+                }
+            }
+            return acc;
+        }, {} as Record<string, any>);
+
+        if (Object.keys(cleanFilters).length > 0) {
+            filters = cleanFilters;
+        }
     }
 
+    const topK = intent?.topK ?? 15;
+
+    // 2. Retrieve IDs from Pinecone
+    const pineconeMatches = await queryProfileData(optimizedQuery, topK || 15, filters);
+    console.log("Pinecone Matches:", pineconeMatches.length);
+
+    // 3. Fetch Content from Contentful
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rawIds = pineconeMatches.map((m: any) => {
+        return m.metadata?.internalId || m.id.split('#')[0];
+    });
+    const ids = Array.from(new Set(rawIds));
+    console.log("Unique Pinecone IDs:", ids);
+
+    // 4. Hydrate
+    const contentfulEntries = await getEntriesByIds(ids);
+    console.log("Hydrated Contentful IDs:", contentfulEntries.map((e: any) => e.sys?.id));
+
+    // 5. Format Context
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const context = contentfulEntries.map((entry: any) => {
+        return JSON.stringify(entry.fields);
+    });
+    console.log("Retrieved Context Items:", context.length);
+
+    const contextString = context.length > 0 ? context.join('\n\n') : "NO CONTEXT FOUND.";
+    const finalPrompt = `
+    PROFILE CONTEXT (RAG DATA):
+    ${contextString}
+
+    USER REQUEST:
+    ${userQuery}
+  `;
+
+    // 6. Generate Layout (Streaming)
+    // We use streamObject to stream an ARRAY of blocks.
+    console.log("Starting streamObject (array mode) with model: gemini-3-pro-preview");
+
+    // We need to guide the model to output a list, though schema helps.
     try {
-        const userQuery = prompt || DEFAULT_LAYOUT_PROMPT;
-
-        // 1. Analyze Intent (LLM)
-        const intent = await detectSearchIntent(userQuery);
-
-        if (!intent) {
-            console.warn("Intent detection failed, falling back to raw query.");
-        }
-
-        const optimizedQuery = intent?.optimizedQuery || userQuery;
-
-        // Sanitize filters: Remove nulls (OpenAI strict mode returns nulls, Pinecone wants undefined)
-        let filters: Record<string, any> | undefined = undefined;
-        if (intent?.filters) {
-            const cleanFilters = Object.entries(intent.filters).reduce((acc, [k, v]) => {
-                if (v !== null && v !== undefined) {
-                    // Normalize: If it's a string, lower command. If it's an object with $in, lower the array items.
-                    if (typeof v === 'string') {
-                        acc[k] = (v as string).toLowerCase();
-                    } else if (typeof v === 'object' && v.$in && Array.isArray(v.$in)) {
-                        if (v.$in.length > 0) {
-                            acc[k] = { ...v, $in: v.$in.map((item: any) => String(item).toLowerCase()) };
-                        }
-                        // If empty array, DO NOT include key. "$in: []" matches nothing in most DBs.
-                    } else {
-                        acc[k] = v;
-                    }
-                }
-                return acc;
-            }, {} as Record<string, any>);
-
-            if (Object.keys(cleanFilters).length > 0) {
-                filters = cleanFilters;
+        const result = await streamObject({
+            model: google('gemini-3-pro-preview'),
+            system: SYSTEM_PROMPT,
+            prompt: finalPrompt + "\n\nReturn the layout as a list of blocks.",
+            schema: LayoutBlockTypeSchema, // The individual item schema
+            output: 'array',
+            onFinish: (ev) => {
+                console.log("API Stream Finished. Usage:", ev.usage);
             }
-        }
-
-        const topK = intent?.topK ?? 15;
-
-        console.log("Search Intent:", JSON.stringify({ optimizedQuery, filters, topK }));
-
-        // 2. Retrieve IDs from Pinecone (Vector Search + Filters)
-        const pineconeMatches = await queryProfileData(optimizedQuery, topK || 15, filters);
-
-        // 3. Fetch Content from Contentful (Source of Truth)
-        // Extract IDs from matches
-        // We must use 'internalId' (clean Contentful ID) not the vector ID (which contains #chunk hash)
-        // Also deduplicate, as multiple chunks from same entry might match.
-
-        const rawIds = pineconeMatches.map((m: any) => {
-            return m.metadata?.internalId || m.id.split('#')[0];
         });
 
-        const ids = Array.from(new Set(rawIds));
-
-        console.log("Pinecone IDs found (Clean & Unique):", ids);
-
-        // 4. Hydrate with Contentful Data
-        const contentfulEntries = await getEntriesByIds(ids);
-
-        // 5. Format Context for AI
-        const context = contentfulEntries.map((entry: any) => {
-            // Flatten entry fields to a string
-            return JSON.stringify(entry.fields);
-        });
-
-        console.log(`Hydrated ${context.length} entries from Contentful`);
-
-        // 6. Generate Layout
-        const layout = await generateLayoutWithContext(userQuery, context);
-
-        return NextResponse.json(layout);
-    } catch (error) {
-        console.error("AI Generation Failed:", error);
-        return NextResponse.json({ error: "Failed to generate layout" }, { status: 500 });
+        console.log("Stream object created, returning stream.");
+        return result.toTextStreamResponse();
+    } catch (err) {
+        console.error("API Stream Creation Failed:", err);
+        throw err;
     }
 }
