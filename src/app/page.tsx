@@ -12,8 +12,17 @@ export default function Home() {
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll when layout is populated and not initial loading
+  const isInitialLoad = useRef(true);
+
+  // Auto-scroll when layout is populated and not initial loading
   useEffect(() => {
     if (layout && !loading && !isGenerating && contentRef.current) {
+      // Prevent scroll on initial load
+      if (isInitialLoad.current) {
+        isInitialLoad.current = false;
+        return;
+      }
+
       // Small timeout to ensure DOM render
       setTimeout(() => {
         contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });

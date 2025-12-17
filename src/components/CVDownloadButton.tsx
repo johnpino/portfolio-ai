@@ -10,7 +10,7 @@ export const CVDownloadButton = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1, duration: 0.5 }}
-            className="fixed top-6 right-6 z-50"
+            className="fixed bottom-6 right-6 z-50"
         >
             <a
                 href="/resume/johnpino_resume.pdf"

@@ -3,6 +3,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/blocks/Hero";
 import "./globals.css";
+import { LayoutProvider } from "@/context/LayoutContext";
+import { ScrollToTop } from '@/components/ScrollToTop';
+import { CVDownloadButton } from '@/components/CVDownloadButton';
+import { StatusBar } from "@/components/StatusBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,12 +23,6 @@ export const metadata: Metadata = {
   description: "Portfolio of John Pino. Specialized in building scalable, composable web ecosystems and redefining engineering workflows with Artificial Intelligence.",
 };
 
-import { LayoutProvider } from "@/context/LayoutContext";
-import { ScrollToTop } from '@/components/ScrollToTop';
-import { CVDownloadButton } from '@/components/CVDownloadButton';
-
-// ... existing imports
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -37,6 +35,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <LayoutProvider>
+          <StatusBar />
           <Hero />
           {children}
           <ScrollToTop />

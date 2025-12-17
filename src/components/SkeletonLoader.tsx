@@ -8,12 +8,7 @@ export const SkeletonLoader = () => {
             <div className="relative w-full mx-auto max-w-6xl px-4 py-24 space-y-24 min-h-screen">
 
                 {/* Status Overlay */}
-                <div className="fixed inset-0 z-20 flex items-center justify-center pointer-events-none">
-                    <div className="bg-white/90 backdrop-blur-md px-8 py-4 rounded-full shadow-2xl border border-slate-100 flex items-center gap-4 animate-in fade-in zoom-in duration-300">
-                        <div className="w-5 h-5 border-2 border-slate-200 border-t-accent-pink rounded-full animate-spin" />
-                        <span className="font-medium text-slate-600 text-sm">Analyzing profile & drafting layout...</span>
-                    </div>
-                </div>
+
 
                 {/* Hero Skeleton */}
                 <div>
