@@ -31,9 +31,8 @@ export default function Home() {
     }
   }, [isGenerating]);
 
-  // If loading and NO layout, show full screen skeleton. 
-  // If we have a layout but are regenerating, we might want to just show the spinner in the input (handled by GlobalInput)
-  if (loading && !layout) {
+  // Show skeleton while loading (until there's at least one renderable block)
+  if (loading) {
     return <SkeletonLoader />;
   }
 

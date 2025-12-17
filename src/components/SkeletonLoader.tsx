@@ -7,9 +7,6 @@ export const SkeletonLoader = () => {
         <SkeletonTheme baseColor="#f8fafc" highlightColor="#e2e8f0">
             <div className="relative w-full mx-auto max-w-6xl px-4 py-24 space-y-24 min-h-screen">
 
-                {/* Status Overlay */}
-
-
                 {/* Hero Skeleton */}
                 <div>
                     <Skeleton height={64} className="w-full" />

@@ -60,9 +60,16 @@ export const LayoutProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     };
 
     const isGenerating = isLoading;
-    // Loading is true if we are expecting data (isLoading) but have no data yet (!layout).
-    // This allows showing a skeleton state initially, then showing the stream as it arrives.
-    const loading = isLoading && !layout;
+
+    // Check if we have at least one renderable block (with type and props)
+    // This prevents the skeleton from disappearing before there's actual content
+    const hasRenderableContent = layout?.layout?.some(
+        (block) => block?.type && block?.props
+    ) ?? false;
+
+    // Loading is true if we are expecting data (isLoading) but have no renderable content yet.
+    // This allows showing a skeleton state until there's actual content to display.
+    const loading = isLoading && !hasRenderableContent;
 
     return (
         <LayoutContext.Provider value={{ layout, loading, isGenerating, generateLayout }}>
