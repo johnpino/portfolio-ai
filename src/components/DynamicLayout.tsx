@@ -1,9 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
 import { useLayoutContext } from '@/context/LayoutContext';
 import { LayoutConfig, BlockType } from '@/types/layout';
+import { StreamingSkeleton } from './SkeletonLoader';
 import { SkillsGrid } from './blocks/SkillsGrid';
 import { CaseStudies } from './blocks/CaseStudies';
 import { Headline } from './blocks/Headline';
@@ -84,30 +83,12 @@ export const DynamicLayout: React.FC<DynamicLayoutProps> = ({ layout }) => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="w-full max-w-6xl mx-auto px-4"
+                    className="w-full"
                 >
-                    <SkeletonTheme baseColor="#f8fafc" highlightColor="#e2e8f0">
-                        <div className="space-y-6">
-                            {/* Section Header Skeleton */}
-                            <div className="mb-6">
-                                <Skeleton height={36} width="35%" />
-                            </div>
-
-                            {/* Content Grid Skeleton */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="p-6 bg-slate-50/50 rounded-2xl border border-slate-100">
-                                    <Skeleton height={24} width="70%" className="mb-3" />
-                                    <Skeleton count={3} />
-                                </div>
-                                <div className="p-6 bg-slate-50/50 rounded-2xl border border-slate-100">
-                                    <Skeleton height={24} width="60%" className="mb-3" />
-                                    <Skeleton count={3} />
-                                </div>
-                            </div>
-                        </div>
-                    </SkeletonTheme>
+                    <StreamingSkeleton />
                 </motion.div>
             )}
         </main>
     );
 };
+
