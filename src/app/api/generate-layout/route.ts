@@ -116,12 +116,12 @@ export async function POST(request: Request) {
   `;
 
     // 5. Generate Layout (Streaming)
-    console.log("Starting streamObject (array mode) with model: gemini-3-flash-preview");
+    console.log("Starting streamObject (array mode) with model: gemini-2.0-flash-exp");
 
     try {
         const result = await streamObject({
             model: google('gemini-2.0-flash-exp'), // Upgrading to faster model if available, or sticking to existing
-            system: SYSTEM_PROMPT + "\n\nCRITICAL SPEED OPTIMIZATION: Keep descriptions concise (max 20 words). Emphasize speed.",
+            system: SYSTEM_PROMPT + "\n\nCRITICAL SPEED OPTIMIZATION: Keep descriptions concise (max 100 words). Emphasize speed.",
             prompt: finalPrompt + "\n\nReturn the layout as a list of blocks.",
             schema: LayoutBlockTypeSchema,
             output: 'array',
