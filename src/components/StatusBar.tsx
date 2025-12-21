@@ -8,10 +8,15 @@ export const StatusBar = () => {
     const [progress, setProgress] = React.useState(0);
 
     React.useEffect(() => {
-        // Start the progress bar animation when component mounts/appears
-        const timer = setTimeout(() => setProgress(100), 50);
-        return () => clearTimeout(timer);
-    }, []);
+        if (loading || isGenerating) {
+            // Reset to 0 first to ensure animation restarts
+            setProgress(0);
+            const timer = setTimeout(() => setProgress(100), 100);
+            return () => clearTimeout(timer);
+        } else {
+            setProgress(0);
+        }
+    }, [loading, isGenerating]);
 
     if (!loading && !isGenerating) return null;
 
