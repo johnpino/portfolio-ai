@@ -8,13 +8,13 @@ const pinecone = new Pinecone({
 
 const INDEX_NAME = process.env.PINECONE_INDEX_NAME || "missing-index-name";
 
-export async function queryProfileData(query: string, topK: number = 15, filter?: Record<string, any>): Promise<any[]> {
+export async function queryProfileData(query: string, topK: number = 15, filter?: Record<string, any>, vector?: number[]): Promise<any[]> {
     try {
         const index = pinecone.index(INDEX_NAME);
-        const vector = await generateEmbedding(query);
+        const queryVector = vector || await generateEmbedding(query);
 
         const queryResponse = await index.query({
-            vector,
+            vector: queryVector,
             topK,
             filter,
             includeMetadata: true,

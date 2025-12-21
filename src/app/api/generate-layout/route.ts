@@ -1,7 +1,7 @@
 import { streamObject } from 'ai';
 import { google } from '@ai-sdk/google';
 import { queryProfileData } from '@/lib/pinecone';
-import { detectSearchIntent } from '@/lib/openai';
+import { detectSearchIntent, generateEmbedding } from '@/lib/openai';
 import { getEntriesByIds } from '@/lib/contentful';
 import { LayoutBlockTypeSchema } from '@/lib/schemas';
 import { DEFAULT_LAYOUT_PROMPT, SYSTEM_PROMPT } from '@/lib/prompts';
@@ -17,6 +17,21 @@ import { DEFAULT_LAYOUT_PROMPT, SYSTEM_PROMPT } from '@/lib/prompts';
  * @param request - The incoming HTTP request containing the prompt.
  * @returns A streaming text response containing the generated layout blocks.
  */
+// Helper to strip sys/metadata/files to reduce token count
+function cleanContext(obj: any): any {
+    if (!obj) return obj;
+    if (Array.isArray(obj)) return obj.map(cleanContext);
+    if (typeof obj === 'object') {
+        const { sys, metadata, file, ...rest } = obj;
+        const cleaned: any = {};
+        for (const key in rest) {
+            cleaned[key] = cleanContext(rest[key]);
+        }
+        return cleaned;
+    }
+    return obj;
+}
+
 export async function POST(request: Request) {
     let prompt = "";
 
@@ -29,8 +44,14 @@ export async function POST(request: Request) {
 
     const userQuery = prompt || DEFAULT_LAYOUT_PROMPT;
 
-    // 1. Analyze Intent (LLM) - Blocked for now, usually fast (0.5s)
-    const intent = await detectSearchIntent(userQuery);
+    // 1. Parallelize Intent Detection & Embedding Generation
+    console.time("AI_Tasks");
+    const [intent, vector] = await Promise.all([
+        detectSearchIntent(userQuery),
+        generateEmbedding(userQuery)
+    ]);
+    console.timeEnd("AI_Tasks");
+
     console.log("Detected Intent:", JSON.stringify(intent, null, 2));
 
     const optimizedQuery = intent?.optimizedQuery || userQuery;
@@ -60,11 +81,13 @@ export async function POST(request: Request) {
 
     const topK = intent?.topK ?? 15;
 
-    // 2. Retrieve IDs from Pinecone
-    const pineconeMatches = await queryProfileData(optimizedQuery, topK || 15, filters);
+    // 2. Retrieve IDs from Pinecone (using pre-calculated vector)
+    console.time("Pinecone");
+    const pineconeMatches = await queryProfileData(optimizedQuery, topK || 15, filters, vector);
+    console.timeEnd("Pinecone");
     console.log("Pinecone Matches:", pineconeMatches.length);
 
-    // 3. Fetch Content from Contentful
+    // 3. Fetch Context
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rawIds = pineconeMatches.map((m: any) => {
         return m.metadata?.internalId || m.id.split('#')[0];
@@ -72,14 +95,14 @@ export async function POST(request: Request) {
     const ids = Array.from(new Set(rawIds));
     console.log("Unique Pinecone IDs:", ids);
 
-    // 4. Hydrate
+    // 4. Hydrate & Optimize Context
     const contentfulEntries = await getEntriesByIds(ids);
     console.log("Hydrated Contentful IDs:", contentfulEntries.map((e: any) => e.sys?.id));
 
-    // 5. Format Context
+    // Cleanup context to minimize tokens
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const context = contentfulEntries.map((entry: any) => {
-        return JSON.stringify(entry.fields);
+        return JSON.stringify(cleanContext(entry.fields));
     });
     console.log("Retrieved Context Items:", context.length);
 
@@ -92,24 +115,21 @@ export async function POST(request: Request) {
     ${userQuery}
   `;
 
-    // 6. Generate Layout (Streaming)
-    // We use streamObject to stream an ARRAY of blocks.
+    // 5. Generate Layout (Streaming)
     console.log("Starting streamObject (array mode) with model: gemini-3-flash-preview");
 
-    // We need to guide the model to output a list, though schema helps.
     try {
         const result = await streamObject({
-            model: google('gemini-3-flash-preview'),
-            system: SYSTEM_PROMPT,
+            model: google('gemini-2.0-flash-exp'), // Upgrading to faster model if available, or sticking to existing
+            system: SYSTEM_PROMPT + "\n\nCRITICAL SPEED OPTIMIZATION: Keep descriptions concise (max 20 words). Emphasize speed.",
             prompt: finalPrompt + "\n\nReturn the layout as a list of blocks.",
-            schema: LayoutBlockTypeSchema, // The individual item schema
+            schema: LayoutBlockTypeSchema,
             output: 'array',
             onFinish: (ev) => {
                 console.log("API Stream Finished. Usage:", ev.usage);
             }
         });
 
-        console.log("Stream object created, returning stream.");
         return result.toTextStreamResponse();
     } catch (err) {
         console.error("API Stream Creation Failed:", err);
