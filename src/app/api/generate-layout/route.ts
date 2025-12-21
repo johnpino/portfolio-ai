@@ -94,12 +94,12 @@ export async function POST(request: Request) {
 
     // 6. Generate Layout (Streaming)
     // We use streamObject to stream an ARRAY of blocks.
-    console.log("Starting streamObject (array mode) with model: gemini-3-pro-preview");
+    console.log("Starting streamObject (array mode) with model: gemini-3-flash-preview");
 
     // We need to guide the model to output a list, though schema helps.
     try {
         const result = await streamObject({
-            model: google('gemini-3-pro-preview'),
+            model: google('gemini-3-flash-preview'),
             system: SYSTEM_PROMPT,
             prompt: finalPrompt + "\n\nReturn the layout as a list of blocks.",
             schema: LayoutBlockTypeSchema, // The individual item schema
