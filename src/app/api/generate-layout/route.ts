@@ -116,11 +116,12 @@ export async function POST(request: Request) {
   `;
 
     // 5. Generate Layout (Streaming)
-    console.log("Starting streamObject (array mode) with model: gemini-2.0-flash-exp");
+    const modelName = process.env.GOOGLE_GENERATIVE_MODEL || "gemini-2.5-flash";
+    console.log(`Starting streamObject (array mode) with model: ${modelName}`);
 
     try {
         const result = await streamObject({
-            model: google('gemini-2.0-flash-exp'), // Upgrading to faster model if available, or sticking to existing
+            model: google(modelName),
             system: SYSTEM_PROMPT + "\n\nCRITICAL SPEED OPTIMIZATION: Keep descriptions concise (max 100 words). Emphasize speed.",
             prompt: finalPrompt + "\n\nReturn the layout as a list of blocks.",
             schema: LayoutBlockTypeSchema,
@@ -132,7 +133,7 @@ export async function POST(request: Request) {
 
         return result.toTextStreamResponse();
     } catch (err) {
-        console.error("API Stream Creation Failed:", err);
+        console.error(`API Stream Creation Failed (${modelName}):`, err);
         throw err;
     }
 }
