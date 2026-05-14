@@ -6,6 +6,69 @@ import { getEntriesByIds } from '@/lib/contentful';
 import { LayoutBlockTypeSchema } from '@/lib/schemas';
 import { DEFAULT_LAYOUT_PROMPT, SYSTEM_PROMPT } from '@/lib/prompts';
 
+const MAX_PROMPT_LENGTH = 800;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 5;
+
+type RateLimitBucket = {
+    count: number;
+    resetAt: number;
+};
+
+type JsonRecord = Record<string, unknown>;
+
+type PineconeFilter = Record<string, unknown>;
+
+type PineconeMatch = {
+    id: string;
+    metadata?: {
+        internalId?: unknown;
+    };
+};
+
+const rateLimitBuckets = new Map<string, RateLimitBucket>();
+
+function jsonError(message: string, status: number) {
+    return Response.json({ error: message }, { status });
+}
+
+function getClientIp(request: Request) {
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    if (forwardedFor) {
+        return forwardedFor.split(',')[0].trim();
+    }
+
+    return request.headers.get('x-real-ip') || 'unknown';
+}
+
+function checkRateLimit(key: string) {
+    const now = Date.now();
+
+    for (const [bucketKey, bucket] of rateLimitBuckets) {
+        if (bucket.resetAt <= now) {
+            rateLimitBuckets.delete(bucketKey);
+        }
+    }
+
+    const bucket = rateLimitBuckets.get(key);
+
+    if (!bucket) {
+        rateLimitBuckets.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+        return true;
+    }
+
+    if (bucket.count >= RATE_LIMIT_MAX_REQUESTS) {
+        return false;
+    }
+
+    bucket.count += 1;
+    return true;
+}
+
+function isRecord(value: unknown): value is JsonRecord {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 
 
 /**
@@ -18,12 +81,16 @@ import { DEFAULT_LAYOUT_PROMPT, SYSTEM_PROMPT } from '@/lib/prompts';
  * @returns A streaming text response containing the generated layout blocks.
  */
 // Helper to strip sys/metadata/files to reduce token count
-function cleanContext(obj: any): any {
+function cleanContext(obj: unknown): unknown {
     if (!obj) return obj;
     if (Array.isArray(obj)) return obj.map(cleanContext);
-    if (typeof obj === 'object') {
-        const { sys, metadata, file, ...rest } = obj;
-        const cleaned: any = {};
+    if (isRecord(obj)) {
+        const rest = { ...obj };
+        const cleaned: JsonRecord = {};
+        delete rest.sys;
+        delete rest.metadata;
+        delete rest.file;
+
         for (const key in rest) {
             cleaned[key] = cleanContext(rest[key]);
         }
@@ -33,13 +100,30 @@ function cleanContext(obj: any): any {
 }
 
 export async function POST(request: Request) {
-    let prompt = "";
+    const clientIp = getClientIp(request);
+
+    if (!checkRateLimit(clientIp)) {
+        return jsonError('Too many requests. Please try again later.', 429);
+    }
+
+    let prompt = '';
 
     try {
-        const body = await request.json();
-        prompt = body.prompt;
+        const body: unknown = await request.json();
+
+        if (isRecord(body) && body.prompt !== undefined) {
+            if (typeof body.prompt !== 'string') {
+                return jsonError('Prompt must be a string.', 400);
+            }
+
+            prompt = body.prompt.trim();
+        }
     } catch (e) {
         console.warn("Failed to parse request body", e);
+    }
+
+    if (prompt.length > MAX_PROMPT_LENGTH) {
+        return jsonError(`Prompt must be ${MAX_PROMPT_LENGTH} characters or fewer.`, 400);
     }
 
     const userQuery = prompt || DEFAULT_LAYOUT_PROMPT;
@@ -57,22 +141,20 @@ export async function POST(request: Request) {
     const optimizedQuery = intent?.optimizedQuery || userQuery;
 
     // Sanitize filters
-    let filters: Record<string, any> | undefined = undefined;
+    let filters: PineconeFilter | undefined = undefined;
     if (intent?.filters) {
-        const cleanFilters = Object.entries(intent.filters).reduce((acc, [k, v]) => {
+        const cleanFilters = Object.entries(intent.filters).reduce<PineconeFilter>((acc, [k, v]) => {
             if (v !== null && v !== undefined) {
-                if (typeof v === 'string') {
-                    acc[k] = (v as string).toLowerCase();
-                } else if (typeof v === 'object' && v.$in && Array.isArray(v.$in)) {
+                if (isRecord(v) && Array.isArray(v.$in)) {
                     if (v.$in.length > 0) {
-                        acc[k] = { ...v, $in: v.$in.map((item: any) => String(item).toLowerCase()) };
+                        acc[k] = { ...v, $in: v.$in.map((item) => String(item).toLowerCase()) };
                     }
                 } else {
                     acc[k] = v;
                 }
             }
             return acc;
-        }, {} as Record<string, any>);
+        }, {});
 
         if (Object.keys(cleanFilters).length > 0) {
             filters = cleanFilters;
@@ -83,25 +165,23 @@ export async function POST(request: Request) {
 
     // 2. Retrieve IDs from Pinecone (using pre-calculated vector)
     console.time("Pinecone");
-    const pineconeMatches = await queryProfileData(optimizedQuery, topK || 15, filters, vector);
+    const pineconeMatches = await queryProfileData(optimizedQuery, topK || 15, filters, vector) as PineconeMatch[];
     console.timeEnd("Pinecone");
     console.log("Pinecone Matches:", pineconeMatches.length);
 
     // 3. Fetch Context
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rawIds = pineconeMatches.map((m: any) => {
-        return m.metadata?.internalId || m.id.split('#')[0];
+    const rawIds = pineconeMatches.map((m) => {
+        return typeof m.metadata?.internalId === 'string' ? m.metadata.internalId : m.id.split('#')[0];
     });
     const ids = Array.from(new Set(rawIds));
     console.log("Unique Pinecone IDs:", ids);
 
     // 4. Hydrate & Optimize Context
     const contentfulEntries = await getEntriesByIds(ids);
-    console.log("Hydrated Contentful IDs:", contentfulEntries.map((e: any) => e.sys?.id));
+    console.log("Hydrated Contentful IDs:", contentfulEntries.map((e) => e.sys?.id));
 
     // Cleanup context to minimize tokens
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const context = contentfulEntries.map((entry: any) => {
+    const context = contentfulEntries.map((entry) => {
         return JSON.stringify(cleanContext(entry.fields));
     });
     console.log("Retrieved Context Items:", context.length);
